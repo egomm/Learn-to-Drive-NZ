@@ -789,6 +789,7 @@ MonoBehaviour:
   threeRoundabout: {fileID: 6071918407754207912, guid: 4add6f0ad0526a7468cffee133f2f402, type: 3}
   fourRoundabout: {fileID: 5910418109304812367, guid: 3abf917109cd49c4b8c265a99d0859a8, type: 3}
   player: {fileID: 4820715994343453486}
+  lastRoad: {x: 0, y: 0, z: 0}
 --- !u!4 &935019862
 Transform:
   m_ObjectHideFlags: 0
@@ -1660,7 +1661,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4820715994343453486}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
