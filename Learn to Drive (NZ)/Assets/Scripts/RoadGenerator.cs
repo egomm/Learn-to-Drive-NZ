@@ -27,19 +27,41 @@ public class RoadGenerator : MonoBehaviour {
     // Nearby road coordinates
     private List<Vector3> nearbyRoadCoordinates = new List<Vector3>();
 
+    // Roundabout frequency
+    private float roundaboutFrequency = 0.075f;
+    private float curveFrequency = 0.225f;
+    private float straightFrequency = 0.7f;
+
     // Start is called before the first frame update
     void Start() {
         /*for (int i = 0; i < 60; i++) {
             Instantiate(straightRoad, new Vector3(0, 0, 13.999f*i), Quaternion.identity);
         }*/
+        // Generate between 600 and 800 roads
+        int roundCount = Random.Range(600, 800);
         Vector3 previousRoadCoordinates = new Vector3(0, 0, 0);
         Vector3 roadCoordinates = new Vector3(0, 0, 0);
-        for (int i = 0; i < 100; i++) {
-            // Not starting at first road
+        int previousRoundabout = 0;
+        for (int i = 0; i < roundCount; i++) {
+            // Make sure there can only be a roundabout every 5 roads
+            float randomRoadGeneration = Random.Range(0f, 1f);
+            GameObject roadType;
+            if (randomRoadGeneration < roundaboutFrequency && (i - previousRoundabout) > 5) {
+                // Roundabout
+                previousRoundabout = i;
+                roadType = twoRoundabout; // Temporary
+            } else if (randomRoadGeneration < curveFrequency + roundaboutFrequency) {
+                // Curve
+                roadType = curvedRoad;
+            } else {
+                // Straight road
+                roadType = straightRoad;
+            }
             if (roadInformation.Count > 0) {
+                // Not starting at the first road
                 roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
             }
-            roadInformation.Add(roadCoordinates, straightRoad);
+            roadInformation.Add(roadCoordinates, roadType);
             previousRoadCoordinates = roadCoordinates;
         }
 
