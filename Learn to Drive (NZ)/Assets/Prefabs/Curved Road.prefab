@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1673299554405284910}
   - component: {fileID: 8831570707930499002}
   - component: {fileID: 1749054830390029305}
+  - component: {fileID: 3313978843337543489}
   m_Layer: 0
   m_Name: Plane.002
   m_TagString: Untagged
@@ -84,6 +85,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &3313978843337543489
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2868775785198294488}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6416302070336371891, guid: 56d187c64833eeb4a99c65caf60b4cdd, type: 3}
 --- !u!1 &4245491205114447306
 GameObject:
   m_ObjectHideFlags: 0
@@ -95,6 +110,7 @@ GameObject:
   - component: {fileID: 7322325381155670915}
   - component: {fileID: 2408860363425937039}
   - component: {fileID: 8188303251405191576}
+  - component: {fileID: 934420453350855004}
   m_Layer: 0
   m_Name: Plane.001
   m_TagString: Untagged
@@ -168,6 +184,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &934420453350855004
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4245491205114447306}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4579454407841743219, guid: 56d187c64833eeb4a99c65caf60b4cdd, type: 3}
 --- !u!1 &8169019478616464268
 GameObject:
   m_ObjectHideFlags: 0
@@ -177,7 +207,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8797218113060733238}
-  - component: {fileID: 6576200148440972985}
   m_Layer: 0
   m_Name: Curved Road
   m_TagString: Untagged
@@ -203,20 +232,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &6576200148440972985
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8169019478616464268}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
 --- !u!1 &9096599455086266489
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,6 +243,7 @@ GameObject:
   - component: {fileID: 5745774079329314886}
   - component: {fileID: 6145350066329532402}
   - component: {fileID: 6572023591936411498}
+  - component: {fileID: 1683868906112459487}
   m_Layer: 0
   m_Name: Plane.003
   m_TagString: Untagged
@@ -301,3 +317,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &1683868906112459487
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9096599455086266489}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -7196802604745430461, guid: 56d187c64833eeb4a99c65caf60b4cdd, type: 3}
