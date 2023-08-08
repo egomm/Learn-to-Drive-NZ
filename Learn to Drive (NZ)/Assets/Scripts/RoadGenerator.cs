@@ -41,8 +41,8 @@ public class RoadGenerator : MonoBehaviour {
     private List<Vector3> activeRoadCoordinates = new List<Vector3>();
 
     // Roundabout frequency
-    private float roundaboutFrequency = 0.075f;
-    private float curveFrequency = 0.225f;
+    private float roundaboutFrequency = 0;//0.075f;
+    private float curveFrequency = 0.3f;//0.225f;
     private float straightFrequency = 0.7f;
 
     // Start is called before the first frame update
@@ -51,7 +51,7 @@ public class RoadGenerator : MonoBehaviour {
             Instantiate(straightRoad, new Vector3(0, 0, 13.999f*i), Quaternion.identity);
         }*/
         // Generate between 600 and 800 roads
-        int roundCount = Random.Range(6, 8);
+        int roundCount = Random.Range(60, 80);
         // Measure the current angle in degrees
         bool changedAngle = false;
         int currentAngle = 0;
@@ -59,10 +59,12 @@ public class RoadGenerator : MonoBehaviour {
         Vector3 roadCoordinates = new Vector3(0, 0, 0);
         int previousRoundabout = 0;
         string previousRoad = "straight";
+        bool lastUsedAlternative = false;
         for (int i = 0; i < roundCount; i++) {
             // Make sure there can only be a roundabout every 5 roads
             float randomRoadGeneration = Random.Range(0f, 1f);
             GameObject roadType;
+            int alternativeAngle = -1;
             if (i > 0) {
                 if (randomRoadGeneration < roundaboutFrequency && (i - previousRoundabout) > 5) {
                     // Roundabout
@@ -82,16 +84,20 @@ public class RoadGenerator : MonoBehaviour {
                     }
                     roadType = curvedRoad;
                     // This needs to depend on the curve
-                    //Debug.Log(currentAngle);
                     if (previousRoad == "straight") {
                         // This isn't accurate atm
                         if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.1f);
-                        } else if (currentAngle == 90) {
+                        } else {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-24.99f, 0, 0.188f);
                         }
                     } else if (previousRoad == "curved") {
-                        roadCoordinates = previousRoadCoordinates + new Vector3(-35.8f, 0, 0.373f);
+                        Debug.Log("Last curved: " + currentAngle);
+                        if (currentAngle == 270) {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-11.403f, 0, 48.131f);
+                        } else {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-35.8f, 0, 0.373f);
+                        }
                     } else {
                         // Roundabout (temp)
                         roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.1f);
@@ -105,18 +111,24 @@ public class RoadGenerator : MonoBehaviour {
                         // change to switch case?
                         if (currentAngle == 0) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
-                        } else if (currentAngle == 90) {
-                            roadCoordinates = previousRoadCoordinates + new Vector3(13.999f, 0, 0);
                         } else if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-13.999f, 0, 0);
+                        } else {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(13.999f, 0, 0);
+                        }
+                        if (lastUsedAlternative) {
+                            Debug.Log("LAst used ALT: " + currentAngle);
+                            alternativeAngle = currentAngle + 90;
+                            roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
                         }
                     } else if (previousRoad == "curved") {
                         // The angle isn't being adjusted correctly
+                        // Angle 0 should? be fine
                         if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-24.99f, 0, 0.182f);
                         } else {
-                            currentAngle = 180;
-                            roadCoordinates = previousRoadCoordinates + new Vector3(-24.99f, 0, 0.182f);
+                            alternativeAngle = currentAngle + 90;
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.111f);
                         }
                     }
                     previousRoad = "straight";
@@ -126,10 +138,17 @@ public class RoadGenerator : MonoBehaviour {
                 roadType = straightRoad;
             }
             Debug.Log(roadType);
-            roadInformation.Add(roadCoordinates, new RoadInformation(roadType, Quaternion.Euler(new Vector3(0, currentAngle, 0))));
-            if (currentAngle == 180) {
-                currentAngle = 90;
+            int angle = currentAngle;
+            if (alternativeAngle >= 0) {
+                angle = alternativeAngle;
+                lastUsedAlternative = true;
+                Debug.Log("Using alt angle of: " + alternativeAngle);
+            } else {
+                lastUsedAlternative = false;
             }
+            Debug.Log(angle);
+            Debug.Log(roadCoordinates);
+            roadInformation.Add(roadCoordinates, new RoadInformation(roadType, Quaternion.Euler(new Vector3(0, angle, 0))));
             previousRoadCoordinates = roadCoordinates;
         }
 
