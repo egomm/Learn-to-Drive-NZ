@@ -41,9 +41,9 @@ public class RoadGenerator : MonoBehaviour {
     private List<Vector3> activeRoadCoordinates = new List<Vector3>();
 
     // Roundabout frequency
-    private float roundaboutFrequency = 0;//0.075f;
-    private float curveFrequency = 0.3f;//0.225f;
-    private float straightFrequency = 0.7f;
+    private float roundaboutFrequency = 0.5f;//0.075f;
+    private float curveFrequency = 0.25f;//0.225f;
+    private float straightFrequency = 0.25f;//0.7f;
 
     // Start is called before the first frame update
     void Start() {
@@ -51,7 +51,7 @@ public class RoadGenerator : MonoBehaviour {
             Instantiate(straightRoad, new Vector3(0, 0, 13.999f*i), Quaternion.identity);
         }*/
         // Generate between 600 and 800 roads
-        int roundCount = Random.Range(60, 80);
+        int roundCount = Random.Range(6, 8);
         // Measure the current angle in degrees
         bool changedAngle = false;
         int currentAngle = 0;
@@ -66,11 +66,32 @@ public class RoadGenerator : MonoBehaviour {
             GameObject roadType;
             int alternativeAngle = -1;
             if (i > 0) {
-                if (randomRoadGeneration < roundaboutFrequency && (i - previousRoundabout) > 5) {
+                if (randomRoadGeneration < roundaboutFrequency && (i - previousRoundabout) > 0) {
                     // Roundabout
                     previousRoundabout = i;
                     roadType = twoRoundabout; // Temporary
-                    roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
+                    Debug.Log("Roundabout: " + currentAngle);
+                    Debug.Log(previousRoadCoordinates);
+                    if (previousRoad == "straight") {
+                        if (currentAngle != 90) {
+                            alternativeAngle = currentAngle + 90;
+                        }
+                        if (currentAngle == 0) {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 42.2f);
+                        } else {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-40f, 0, 0);
+                        }
+                    } else if (previousRoad == "curved") {
+                        // In this case the current angle is 90
+                        if (currentAngle == 270) {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-53.23f, 0, 0.19f);
+                        } else {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 59.328f);
+                        }
+                        if (currentAngle == 270) {
+                            alternativeAngle = currentAngle + 90;
+                        }
+                    }
                     previousRoad = "roundabout";
                 } else if (randomRoadGeneration < curveFrequency + roundaboutFrequency) {
                     // Curve: need to make this adjust to the coordinate
@@ -100,7 +121,11 @@ public class RoadGenerator : MonoBehaviour {
                         }
                     } else {
                         // Roundabout (temp)
-                        roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.1f);
+                        if (currentAngle == 270) {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 59.37f);
+                        } else {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-53.23f, 0, 0.19f);
+                        }
                     }
                     previousRoad = "curved";
                 } else {
@@ -130,6 +155,14 @@ public class RoadGenerator : MonoBehaviour {
                             alternativeAngle = currentAngle + 90;
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.111f);
                         }
+                    } else {
+                        // Roundabout (temp)
+                        Debug.Log("Roundabout: " + currentAngle);
+                        if (currentAngle == 270) {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(42.2f, 0, 0.19f);
+                        } else {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 42.2f);
+                        }
                     }
                     previousRoad = "straight";
                 }
@@ -148,8 +181,12 @@ public class RoadGenerator : MonoBehaviour {
             }
             Debug.Log(angle);
             Debug.Log(roadCoordinates);
-            roadInformation.Add(roadCoordinates, new RoadInformation(roadType, Quaternion.Euler(new Vector3(0, angle, 0))));
-            previousRoadCoordinates = roadCoordinates;
+            if (!roadInformation.ContainsKey(roadCoordinates)) {
+                roadInformation.Add(roadCoordinates, new RoadInformation(roadType, Quaternion.Euler(new Vector3(0, angle, 0))));
+                previousRoadCoordinates = roadCoordinates;
+            } else {
+                i--;
+            }
         }
 
         UpdateNearbyRoadCoordinates();
