@@ -51,7 +51,7 @@ public class RoadGenerator : MonoBehaviour {
             Instantiate(straightRoad, new Vector3(0, 0, 13.999f*i), Quaternion.identity);
         }*/
         // Generate between 600 and 800 roads
-        int roundCount = Random.Range(6, 8);
+        int roundCount = Random.Range(60, 80);
         // Measure the current angle in degrees
         bool changedAngle = false;
         int currentAngle = 0;
