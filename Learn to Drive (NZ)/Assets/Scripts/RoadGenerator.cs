@@ -41,9 +41,9 @@ public class RoadGenerator : MonoBehaviour {
     private List<Vector3> activeRoadCoordinates = new List<Vector3>();
 
     // Roundabout frequency
-    private float roundaboutFrequency = 0.5f;//0.075f;
-    private float curveFrequency = 0.25f;//0.225f;
-    private float straightFrequency = 0.25f;//0.7f;
+    private float roundaboutFrequency = 0.2f;//0.075f;
+    private float curveFrequency = 0.05f;//0.225f;
+    private float straightFrequency = 0.75f;//0.7f;
 
     // Start is called before the first frame update
     void Start() {
@@ -58,6 +58,7 @@ public class RoadGenerator : MonoBehaviour {
         Vector3 previousRoadCoordinates = new Vector3(0, 0, 0);
         Vector3 roadCoordinates = new Vector3(0, 0, 0);
         int previousRoundabout = 0;
+        int previousCurve = 0;
         string previousRoad = "straight";
         bool lastUsedAlternative = false;
         for (int i = 0; i < roundCount; i++) {
@@ -66,7 +67,7 @@ public class RoadGenerator : MonoBehaviour {
             GameObject roadType;
             int alternativeAngle = -1;
             if (i > 0) {
-                if (randomRoadGeneration < roundaboutFrequency && (i - previousRoundabout) > 0) {
+                if (randomRoadGeneration < roundaboutFrequency && (i - previousRoundabout) > 1 && (i - previousCurve) > 1) {
                     // Roundabout
                     previousRoundabout = i;
                     roadType = twoRoundabout; // Temporary
@@ -76,7 +77,7 @@ public class RoadGenerator : MonoBehaviour {
                         if (currentAngle != 90) {
                             alternativeAngle = currentAngle + 90;
                         }
-                        if (currentAngle == 0) {
+                        if (currentAngle == 0 || currentAngle == 90) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 42.2f);
                         } else {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-40f, 0, 0);
@@ -96,6 +97,7 @@ public class RoadGenerator : MonoBehaviour {
                 } else if (randomRoadGeneration < curveFrequency + roundaboutFrequency) {
                     // Curve: need to make this adjust to the coordinate
                     // If the current angle is 0 degrees, decrease it by 90 to 270 degrees
+                    previousCurve = i;
                     // This needs work 
                     if (changedAngle) {
                         currentAngle = (currentAngle <= 90) ? 270 : currentAngle - 180;
@@ -122,8 +124,10 @@ public class RoadGenerator : MonoBehaviour {
                     } else {
                         // Roundabout (temp)
                         if (currentAngle == 270) {
+                            Debug.Log("CURVED R!: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 59.37f);
                         } else {
+                            Debug.Log("CURVED R: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(-53.23f, 0, 0.19f);
                         }
                     }
@@ -141,6 +145,7 @@ public class RoadGenerator : MonoBehaviour {
                         } else {
                             roadCoordinates = previousRoadCoordinates + new Vector3(13.999f, 0, 0);
                         }
+                        Debug.Log("Last used ALT?: " + lastUsedAlternative);
                         if (lastUsedAlternative) {
                             Debug.Log("LAst used ALT: " + currentAngle);
                             alternativeAngle = currentAngle + 90;
@@ -157,11 +162,18 @@ public class RoadGenerator : MonoBehaviour {
                         }
                     } else {
                         // Roundabout (temp)
-                        Debug.Log("Roundabout: " + currentAngle);
+                        /*THIS IS WHERE THE ONlY ISSUE IS CURRENTLY!*/
                         if (currentAngle == 270) {
-                            roadCoordinates = previousRoadCoordinates + new Vector3(42.2f, 0, 0.19f);
+                            Debug.Log("Straight Roundabout!: " + currentAngle);
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-42.2f, 0, 0);
+                            lastUsedAlternative = false;
                         } else {
+                            Debug.Log("Straight Roundabout: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 42.2f);
+                            if (lastUsedAlternative) {
+                                alternativeAngle = currentAngle + 90;
+                                //roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
+                            }
                         }
                     }
                     previousRoad = "straight";
@@ -176,11 +188,14 @@ public class RoadGenerator : MonoBehaviour {
                 angle = alternativeAngle;
                 lastUsedAlternative = true;
                 Debug.Log("Using alt angle of: " + alternativeAngle);
-            } else {
+            } else if (previousRoad != "roundabout") {
                 lastUsedAlternative = false;
+            } else {
+                lastUsedAlternative = true;
             }
             Debug.Log(angle);
             Debug.Log(roadCoordinates);
+            Debug.Log(lastUsedAlternative);
             if (!roadInformation.ContainsKey(roadCoordinates)) {
                 roadInformation.Add(roadCoordinates, new RoadInformation(roadType, Quaternion.Euler(new Vector3(0, angle, 0))));
                 previousRoadCoordinates = roadCoordinates;
