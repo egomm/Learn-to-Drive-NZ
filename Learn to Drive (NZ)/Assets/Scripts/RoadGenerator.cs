@@ -51,7 +51,7 @@ public class RoadGenerator : MonoBehaviour {
             Instantiate(straightRoad, new Vector3(0, 0, 13.999f*i), Quaternion.identity);
         }*/
         // Generate between 600 and 800 roads
-        int roundCount = Random.Range(60, 80);
+        int roundCount = Random.Range(600, 800);
         // Measure the current angle in degrees
         bool changedAngle = false;
         int currentAngle = 0;
@@ -138,7 +138,7 @@ public class RoadGenerator : MonoBehaviour {
                     // Check what the previous road was
                     if (previousRoad == "straight") {
                         // change to switch case?
-                        if (currentAngle == 0) {
+                        if (currentAngle == 0 || currentAngle == 180) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
                         } else if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-13.999f, 0, 0);
@@ -157,13 +157,13 @@ public class RoadGenerator : MonoBehaviour {
                         if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-24.99f, 0, 0.182f);
                         } else {
-                            alternativeAngle = currentAngle + 90;
+                            currentAngle -= 90; // TEMP WAS ALTANGLE BEFORE
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.111f);
                         }
                     } else {
                         // Roundabout (temp)
                         /*THIS IS WHERE THE ONlY ISSUE IS CURRENTLY!*/
-                        alternativeAngle = currentAngle + 90;
+                        //alternativeAngle = currentAngle + 90;
                         if (currentAngle == 270) {
                             Debug.Log("Straight Roundabout!: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(-42.2f, 0, 0);
