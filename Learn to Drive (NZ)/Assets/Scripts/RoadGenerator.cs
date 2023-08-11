@@ -163,6 +163,7 @@ public class RoadGenerator : MonoBehaviour {
                     } else {
                         // Roundabout (temp)
                         /*THIS IS WHERE THE ONlY ISSUE IS CURRENTLY!*/
+                        alternativeAngle = currentAngle + 90;
                         if (currentAngle == 270) {
                             Debug.Log("Straight Roundabout!: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(-42.2f, 0, 0);
@@ -171,7 +172,7 @@ public class RoadGenerator : MonoBehaviour {
                             Debug.Log("Straight Roundabout: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 42.2f);
                             if (lastUsedAlternative) {
-                                alternativeAngle = currentAngle + 90;
+                                //alternativeAngle = currentAngle + 90;
                                 //roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
                             }
                         }
@@ -190,8 +191,11 @@ public class RoadGenerator : MonoBehaviour {
                 Debug.Log("Using alt angle of: " + alternativeAngle);
             } else if (previousRoad != "roundabout") {
                 lastUsedAlternative = false;
-            } else {
+            }/* else {
                 lastUsedAlternative = true;
+            }*/
+            if (previousRoad == "roundabout") {
+                lastUsedAlternative = false;
             }
             Debug.Log(angle);
             Debug.Log(roadCoordinates);
