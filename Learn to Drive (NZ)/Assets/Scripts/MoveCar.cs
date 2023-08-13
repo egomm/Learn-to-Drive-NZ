@@ -21,7 +21,7 @@ public class MoveCar : MonoBehaviour {
     private bool movingForward = false;
     private bool movingBackward = false;
 
-    private NavMeshAgent navAgent;
+    Vector3 lastValidPosition = new Vector3(0, 0.07f, 0);
 
     bool IsOnNavMesh(Vector3 position) {
         UnityEngine.AI.NavMeshHit hit;
@@ -30,7 +30,7 @@ public class MoveCar : MonoBehaviour {
 
     void Start() {
         rb = GetComponent<Rigidbody>();
-        navAgent = GetComponent<NavMeshAgent>();
+        //navAgent = GetComponent<NavMeshAgent>();
 
         // Check if the car's starting position is on the NavMesh
         if (!IsOnNavMesh(transform.position)) {
@@ -40,10 +40,25 @@ public class MoveCar : MonoBehaviour {
         }
     }
 
+    bool CheckIfCarOnNavMesh() {
+        NavMeshHit hit;
+        return NavMesh.SamplePosition(transform.position, out hit, 0.1f, NavMesh.AllAreas);
+    }
+
     void FixedUpdate() {
+        bool onNavMesh = false;
+        if (transform.position.y < 0.1f) {
+            onNavMesh = CheckIfCarOnNavMesh();
+            if (onNavMesh) {
+                lastValidPosition = transform.position;
+            } else {
+                transform.position = lastValidPosition;
+                Debug.Log(lastValidPosition);
+            }
+        }
         // Temporary until a better system is devised
         //GetComponent<Rigidbody>().AddForce(Vector3.down * 10E9f);
-        if (Input.GetKey("w") && !movingBackward && currentSpeed >= 0) {
+        if (Input.GetKey("w") && !movingBackward && currentSpeed >= 0 && onNavMesh) {
             if (movingForward && currentSpeed < speed) {
                 currentSpeed += 50f * Time.deltaTime * (float) Math.Exp(-0.4f * currentSpeed);
                 //Debug.Log((float)Math.Exp(-0.5f*currentSpeed));
@@ -55,7 +70,7 @@ public class MoveCar : MonoBehaviour {
         } else {
             movingForward = false;
         }
-        if (Input.GetKey("s") && !movingForward && currentSpeed <= 0) {
+        if (Input.GetKey("s") && !movingForward && currentSpeed <= 0 && onNavMesh) {
             //transform.Translate(backward * currentSpeed * Time.deltaTime);
             currentSpeed -= 10f * Time.deltaTime * (float) Math.Exp(0.4f * currentSpeed);
             movingBackward = true;
