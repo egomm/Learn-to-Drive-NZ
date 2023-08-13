@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using TMPro;
 using System;
 
@@ -20,8 +21,23 @@ public class MoveCar : MonoBehaviour {
     private bool movingForward = false;
     private bool movingBackward = false;
 
+    private NavMeshAgent navAgent;
+
+    bool IsOnNavMesh(Vector3 position) {
+        UnityEngine.AI.NavMeshHit hit;
+        return NavMesh.SamplePosition(position, out hit, 0.1f, NavMesh.AllAreas);
+    }
+
     void Start() {
         rb = GetComponent<Rigidbody>();
+        navAgent = GetComponent<NavMeshAgent>();
+
+        // Check if the car's starting position is on the NavMesh
+        if (!IsOnNavMesh(transform.position)) {
+            Debug.Log("Car's starting position is not on the NavMesh.");
+        } else {
+            Debug.Log("ON NAVMESH!");
+        }
     }
 
     void FixedUpdate() {
@@ -30,7 +46,7 @@ public class MoveCar : MonoBehaviour {
         if (Input.GetKey("w") && !movingBackward && currentSpeed >= 0) {
             if (movingForward && currentSpeed < speed) {
                 currentSpeed += 50f * Time.deltaTime * (float) Math.Exp(-0.4f * currentSpeed);
-                Debug.Log((float)Math.Exp(-0.5f*currentSpeed));
+                //Debug.Log((float)Math.Exp(-0.5f*currentSpeed));
                 if (currentSpeed > speed) {
                     currentSpeed = speed;
                 }

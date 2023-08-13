@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using Unity.AI.Navigation;
 
 public class RoadGenerator : MonoBehaviour {
     // Class for the road information
@@ -71,8 +73,8 @@ public class RoadGenerator : MonoBehaviour {
                     // Roundabout
                     previousRoundabout = i;
                     roadType = twoRoundabout; // Temporary
-                    Debug.Log("Roundabout: " + currentAngle);
-                    Debug.Log(previousRoadCoordinates);
+                    //Debug.Log("Roundabout: " + currentAngle);
+                    //Debug.Log(previousRoadCoordinates);
                     if (previousRoad == "straight") {
                         if (currentAngle != 90) {
                             alternativeAngle = currentAngle + 90;
@@ -115,7 +117,7 @@ public class RoadGenerator : MonoBehaviour {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-24.99f, 0, 0.188f);
                         }
                     } else if (previousRoad == "curved") {
-                        Debug.Log("Last curved: " + currentAngle);
+                        //Debug.Log("Last curved: " + currentAngle);
                         if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-11.403f, 0, 48.131f);
                         } else {
@@ -124,10 +126,10 @@ public class RoadGenerator : MonoBehaviour {
                     } else {
                         // Roundabout (temp)
                         if (currentAngle == 270) {
-                            Debug.Log("CURVED R!: " + currentAngle);
+                            //Debug.Log("CURVED R!: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 59.37f);
                         } else {
-                            Debug.Log("CURVED R: " + currentAngle);
+                            //Debug.Log("CURVED R: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(-53.23f, 0, 0.19f);
                         }
                     }
@@ -145,9 +147,9 @@ public class RoadGenerator : MonoBehaviour {
                         } else {
                             roadCoordinates = previousRoadCoordinates + new Vector3(13.999f, 0, 0);
                         }
-                        Debug.Log("Last used ALT?: " + lastUsedAlternative);
+                        //Debug.Log("Last used ALT?: " + lastUsedAlternative);
                         if (lastUsedAlternative) {
-                            Debug.Log("LAst used ALT: " + currentAngle);
+                            //Debug.Log("LAst used ALT: " + currentAngle);
                             alternativeAngle = currentAngle + 90;
                             roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
                         }
@@ -165,11 +167,11 @@ public class RoadGenerator : MonoBehaviour {
                         /*THIS IS WHERE THE ONlY ISSUE IS CURRENTLY!*/
                         //alternativeAngle = currentAngle + 90;
                         if (currentAngle == 270) {
-                            Debug.Log("Straight Roundabout!: " + currentAngle);
+                            //Debug.Log("Straight Roundabout!: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(-42.2f, 0, 0);
                             lastUsedAlternative = false;
                         } else {
-                            Debug.Log("Straight Roundabout: " + currentAngle);
+                            //Debug.Log("Straight Roundabout: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 42.2f);
                             if (lastUsedAlternative) {
                                 //alternativeAngle = currentAngle + 90;
@@ -183,12 +185,12 @@ public class RoadGenerator : MonoBehaviour {
                 // First road 
                 roadType = straightRoad;
             }
-            Debug.Log(roadType);
+            //Debug.Log(roadType);
             int angle = currentAngle;
             if (alternativeAngle >= 0) {
                 angle = alternativeAngle;
                 lastUsedAlternative = true;
-                Debug.Log("Using alt angle of: " + alternativeAngle);
+                //Debug.Log("Using alt angle of: " + alternativeAngle);
             } else if (previousRoad != "roundabout") {
                 lastUsedAlternative = false;
             }/* else {
@@ -197,9 +199,9 @@ public class RoadGenerator : MonoBehaviour {
             if (previousRoad == "roundabout") {
                 lastUsedAlternative = false;
             }
-            Debug.Log(angle);
-            Debug.Log(roadCoordinates);
-            Debug.Log(lastUsedAlternative);
+            //Debug.Log(angle);
+            //Debug.Log(roadCoordinates);
+            //Debug.Log(lastUsedAlternative);
             if (!roadInformation.ContainsKey(roadCoordinates)) {
                 roadInformation.Add(roadCoordinates, new RoadInformation(roadType, Quaternion.Euler(new Vector3(0, angle, 0))));
                 previousRoadCoordinates = roadCoordinates;
@@ -225,7 +227,18 @@ public class RoadGenerator : MonoBehaviour {
             foreach (var roadCoordinate in nearbyRoadCoordinates) {
                 if (!activeRoadCoordinates.Contains(roadCoordinate)) {
                     RoadInformation currentRoadInformation = roadInformation[roadCoordinate];
-                    Instantiate(currentRoadInformation.GameObject, roadCoordinate, currentRoadInformation.Quaternion);
+                    GameObject roadPrefab = currentRoadInformation.GameObject;
+                    Quaternion roadRotation = currentRoadInformation.Quaternion;
+
+                    GameObject roadInstance = Instantiate(roadPrefab, roadCoordinate, roadRotation);
+
+                    NavMeshSurface navMeshSurface = roadInstance.GetComponent<NavMeshSurface>();
+                    if (navMeshSurface != null) {
+                        navMeshSurface.BuildNavMesh();
+                    } else {
+                        Debug.Log("No NavMeshSurface component found on the instantiated road object.");
+                    }
+
                     activeRoadCoordinates.Add(roadCoordinate);
                 }
             }
