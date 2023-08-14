@@ -42,7 +42,8 @@ public class MoveCar : MonoBehaviour {
 
     bool CheckIfCarOnNavMesh() {
         NavMeshHit hit;
-        return NavMesh.SamplePosition(transform.position, out hit, 0.1f, NavMesh.AllAreas);
+        //int desiredNavMeshLayer = NavMesh.GetNavMeshLayerFromName("YourDesiredLayerName");
+        return NavMesh.SamplePosition(transform.position, out hit, 0.5f, NavMesh.AllAreas);
     }
 
     void FixedUpdate() {

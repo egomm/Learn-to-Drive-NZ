@@ -643,7 +643,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a928a3b98496b545a433bd37417ad9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  straightRoad: {fileID: 6949776678153844067, guid: 810c01dd5da96ca44b371967c273965a, type: 3}
+  straightRoad: {fileID: 5641843003947793379, guid: 8f0e4e5a44cff9243b1283062bf7bc97, type: 3}
   curvedRoad: {fileID: 4481158462815590379, guid: ed0eda989f7c6d34e94e74299edc4e49, type: 3}
   twoRoundabout: {fileID: 56277836195935686, guid: 44ab1d9e753ab3a43b41edb7e7fcc9bb, type: 3}
   threeRoundabout: {fileID: 6071918407754207912, guid: 4add6f0ad0526a7468cffee133f2f402, type: 3}
