@@ -251,11 +251,17 @@ public class RoadGenerator : MonoBehaviour {
                             }
                         }
                     }*/
-
+                    Debug.Log("Adding?");
+                    Debug.Log(roadInstance);
+                    
                     // Add NavMeshSurface components for each desired NavMesh
-                    NavMeshSurface leftLaneNavMesh = roadInstance.AddComponent<NavMeshSurface>();
+                    NavMeshSurface leftLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
+                    NavMeshSurface rightLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
+                    NavMeshSurface combinedNavMesh = gameObject.AddComponent<NavMeshSurface>();
+                    /*
+                                         NavMeshSurface leftLaneNavMesh = roadInstance.AddComponent<NavMeshSurface>();
                     NavMeshSurface rightLaneNavMesh = roadInstance.AddComponent<NavMeshSurface>();
-                    NavMeshSurface combinedNavMesh = roadInstance.AddComponent<NavMeshSurface>();
+                    NavMeshSurface combinedNavMesh = roadInstance.AddComponent<NavMeshSurface>();*/
 
                     // Set properties for the left lane NavMesh
                     //leftLaneNavMesh.collectObjects = CollectObjects.Volume;

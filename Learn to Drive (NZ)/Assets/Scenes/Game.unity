@@ -644,7 +644,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   straightRoad: {fileID: 5641843003947793379, guid: 8f0e4e5a44cff9243b1283062bf7bc97, type: 3}
-  curvedRoad: {fileID: 4481158462815590379, guid: ed0eda989f7c6d34e94e74299edc4e49, type: 3}
+  curvedRoad: {fileID: 5696862384850834263, guid: e8d19cf05b2c45545adc6459b84c48f4, type: 3}
   twoRoundabout: {fileID: 56277836195935686, guid: 44ab1d9e753ab3a43b41edb7e7fcc9bb, type: 3}
   threeRoundabout: {fileID: 6071918407754207912, guid: 4add6f0ad0526a7468cffee133f2f402, type: 3}
   fourRoundabout: {fileID: 5910418109304812367, guid: 3abf917109cd49c4b8c265a99d0859a8, type: 3}
