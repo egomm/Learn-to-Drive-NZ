@@ -645,7 +645,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   straightRoad: {fileID: 5641843003947793379, guid: 8f0e4e5a44cff9243b1283062bf7bc97, type: 3}
   curvedRoad: {fileID: 5696862384850834263, guid: e8d19cf05b2c45545adc6459b84c48f4, type: 3}
-  twoRoundabout: {fileID: 128736311184786079, guid: 22793349f71dea2459996b51fa579c33, type: 3}
+  twoRoundabout: {fileID: 7666581963594541766, guid: 482907e9a366c7247bda70a3bd0fc600, type: 3}
   threeRoundabout: {fileID: 6071918407754207912, guid: 4add6f0ad0526a7468cffee133f2f402, type: 3}
   fourRoundabout: {fileID: 5910418109304812367, guid: 3abf917109cd49c4b8c265a99d0859a8, type: 3}
   player: {fileID: 4461294101673359143}
