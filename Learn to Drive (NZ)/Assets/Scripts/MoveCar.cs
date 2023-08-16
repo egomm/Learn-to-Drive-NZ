@@ -45,6 +45,13 @@ public class MoveCar : MonoBehaviour {
         //int desiredNavMeshLayer = NavMesh.GetNavMeshLayerFromName("YourDesiredLayerName");
         return NavMesh.SamplePosition(transform.position, out hit, 0.5f, NavMesh.AllAreas);
     }
+    
+    void OnCollisionEnter(Collision col) {
+        /*
+        This can be easily used to control 
+        */
+        //Debug.Log(col.gameObject);
+    }
 
     void FixedUpdate() {
         bool onNavMesh = false;

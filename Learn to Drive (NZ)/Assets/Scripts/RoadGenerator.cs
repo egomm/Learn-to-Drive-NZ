@@ -41,6 +41,8 @@ public class RoadGenerator : MonoBehaviour {
     private List<Vector3> nearbyRoadCoordinates = new List<Vector3>();
     // Active road coordinates 
     private List<Vector3> activeRoadCoordinates = new List<Vector3>();
+    // Active road prefabs 
+    public static Dictionary<Vector3, GameObject> activeRoadPrefabs = new Dictionary<Vector3, GameObject>();
 
     // Roundabout frequency
     private float roundaboutFrequency = 0.2f;//0.075f;
@@ -224,62 +226,67 @@ public class RoadGenerator : MonoBehaviour {
 
         // Instantiate nearby road objects at a controlled frequency
         if (Time.frameCount % 10 == 0) {
+            bool addedNewRoad = false;
             foreach (var roadCoordinate in nearbyRoadCoordinates) {
                 if (!activeRoadCoordinates.Contains(roadCoordinate)) {
                     RoadInformation currentRoadInformation = roadInformation[roadCoordinate];
                     GameObject roadPrefab = currentRoadInformation.GameObject;
                     Quaternion roadRotation = currentRoadInformation.Quaternion;
-
                     GameObject roadInstance = Instantiate(roadPrefab, roadCoordinate, roadRotation);
-
-                    /*NavMeshSurface navMeshRoad = roadInstance.GetComponent<NavMeshSurface>();
-                    if (navMeshRoad != null) {
-                        navMeshRoad.BuildNavMesh();
-                    } else {
-                        Debug.Log("No NavMeshSurface component found on the instantiated road object.");
-                    }
-                    foreach (Transform child in roadInstance.transform) {
-                        GameObject childObject = child.gameObject;
-                        bool isLeftLane = childObject.layer == LayerMask.NameToLayer("left");
-                        bool isRightLane = childObject.layer == LayerMask.NameToLayer("right");
-                        if (isLeftLane || isRightLane) {
-                            NavMeshSurface navMeshSurface = child.GetComponent<NavMeshSurface>();
-                            if (navMeshSurface != null) {
-                                navMeshSurface.BuildNavMesh();
-                            } else {
-                                Debug.Log("No NavMeshSurface component found on the instantiated road object.");
-                            }
-                        }
-                    }*/
-                    Debug.Log("Adding?");
-                    Debug.Log(roadInstance);
-                    
-                    // Add NavMeshSurface components for each desired NavMesh
-                    NavMeshSurface leftLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
-                    NavMeshSurface rightLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
-                    NavMeshSurface combinedNavMesh = gameObject.AddComponent<NavMeshSurface>();
-                    /*
-                                         NavMeshSurface leftLaneNavMesh = roadInstance.AddComponent<NavMeshSurface>();
-                    NavMeshSurface rightLaneNavMesh = roadInstance.AddComponent<NavMeshSurface>();
-                    NavMeshSurface combinedNavMesh = roadInstance.AddComponent<NavMeshSurface>();*/
-
-                    // Set properties for the left lane NavMesh
-                    //leftLaneNavMesh.collectObjects = CollectObjects.Volume;
-                    leftLaneNavMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
-                    leftLaneNavMesh.layerMask = LayerMask.GetMask("left");
-                    leftLaneNavMesh.BuildNavMesh();
-
-                    rightLaneNavMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
-                    rightLaneNavMesh.layerMask = LayerMask.GetMask("right");
-                    rightLaneNavMesh.BuildNavMesh();
-
-                    // Set properties for the combined NavMesh
-                    combinedNavMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
-                    combinedNavMesh.layerMask = LayerMask.GetMask("left", "right");
-                    combinedNavMesh.BuildNavMesh();
-
                     activeRoadCoordinates.Add(roadCoordinate);
+                    activeRoadPrefabs[roadCoordinate] = roadInstance;
+                    addedNewRoad = true;
                 }
+            }
+            if (addedNewRoad) {
+                // Remove existing NavMeshSurface components
+                NavMeshSurface[] existingNavMeshSurfaces = gameObject.GetComponents<NavMeshSurface>();
+                foreach (NavMeshSurface existingSurface in existingNavMeshSurfaces) {
+                    Destroy(existingSurface);
+                }
+                //NavMeshSurface navmesh = gameObject.AddComponent<NavMeshSurface>();
+                //navmesh.BuildNavMesh();
+                
+                // Add NavMeshSurface components for each desired NavMesh
+                NavMeshSurface leftLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
+                NavMeshSurface rightLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
+                NavMeshSurface combinedNavMesh = gameObject.AddComponent<NavMeshSurface>();
+                /*
+                                        NavMeshSurface leftLaneNavMesh = roadInstance.AddComponent<NavMeshSurface>();
+                NavMeshSurface rightLaneNavMesh = roadInstance.AddComponent<NavMeshSurface>();
+                NavMeshSurface combinedNavMesh = roadInstance.AddComponent<NavMeshSurface>();*/
+
+                // Set properties for the left lane NavMesh
+                //leftLaneNavMesh.collectObjects = CollectObjects.Volume;
+                
+                Debug.Log("BAKING?");
+                //leftLaneNavMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+                leftLaneNavMesh.layerMask = LayerMask.GetMask("left");
+                leftLaneNavMesh.BuildNavMesh();
+
+                //rightLaneNavMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+                rightLaneNavMesh.layerMask = LayerMask.GetMask("right");
+                rightLaneNavMesh.BuildNavMesh();
+
+                // Set properties for the combined NavMesh
+                //combinedNavMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+                combinedNavMesh.layerMask = LayerMask.GetMask("left", "right");
+                combinedNavMesh.BuildNavMesh();
+            }
+            // After adding new roads, remove far away roads
+            float squaredDistanceThreshold = 10000f; // (100 units)^2
+            Vector3 playerPosition = player.transform.position;
+            List<Vector3> coordinatesToRemove = new List<Vector3>();
+            foreach (var roadCoordinate in activeRoadCoordinates) {
+                if (Vector3.SqrMagnitude(roadCoordinate - playerPosition) > squaredDistanceThreshold) {
+                    // Remove the road coordinate and destroy it 
+                    coordinatesToRemove.Add(roadCoordinate);
+                    Destroy(activeRoadPrefabs[roadCoordinate]);
+                }
+            }
+            foreach(var coordinate in coordinatesToRemove) {
+                activeRoadCoordinates.Remove(coordinate);
+                activeRoadPrefabs.Remove(coordinate);
             }
         }
     }
@@ -288,7 +295,7 @@ public class RoadGenerator : MonoBehaviour {
         nearbyRoadCoordinates.Clear();
 
         // Calculate the squared distance 
-        float squaredDistanceThreshold = 10000f; // (100 units distance)^2
+        float squaredDistanceThreshold = 5625f; // (75 units distance)^2
         Vector3 playerPosition = player.transform.position;
 
         foreach (var roadCoordinate in roadInformation.Keys) {
