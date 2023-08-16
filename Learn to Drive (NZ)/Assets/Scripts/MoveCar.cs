@@ -48,7 +48,8 @@ public class MoveCar : MonoBehaviour {
     
     void OnCollisionEnter(Collision col) {
         /*
-        This can be easily used to control 
+        This can be easily used to control when the player hits the barrier,
+        another car, a pedestrian, or crosses to the wrong side of the road
         */
         //Debug.Log(col.gameObject);
     }
