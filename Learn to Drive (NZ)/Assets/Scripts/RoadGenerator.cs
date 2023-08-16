@@ -34,7 +34,7 @@ public class RoadGenerator : MonoBehaviour {
     private Vector3 lastPlayerPosition;
 
     // Last value added to the dictionary
-    public Vector3 lastRoad = new Vector3(0, 0, 0);
+    public Vector3 lastRoad = new Vector3(0, 0, 0); // Redundant?
     // Dictionary for managing all of the roads with a Vector3 and object
     public static Dictionary<Vector3, RoadInformation> roadInformation = new Dictionary<Vector3, RoadInformation>();
     // Nearby road coordinates
@@ -116,6 +116,7 @@ public class RoadGenerator : MonoBehaviour {
                         if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.1f);
                         } else {
+                            // WAS 24.99 BEFORE
                             roadCoordinates = previousRoadCoordinates + new Vector3(-24.99f, 0, 0.188f);
                         }
                     } else if (previousRoad == "curved") {
