@@ -737,6 +737,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   straightRoad: {fileID: 5641843003947793379, guid: 8f0e4e5a44cff9243b1283062bf7bc97, type: 3}
   curvedRoad: {fileID: 5696862384850834263, guid: e8d19cf05b2c45545adc6459b84c48f4, type: 3}
+  alternativeCurvedRoad: {fileID: 5696862384850834263, guid: fd06d88d462fc1a448aeb85733124b02, type: 3}
   twoRoundabout: {fileID: 7666581963594541766, guid: 482907e9a366c7247bda70a3bd0fc600, type: 3}
   threeRoundabout: {fileID: 6071918407754207912, guid: 4add6f0ad0526a7468cffee133f2f402, type: 3}
   fourRoundabout: {fileID: 5910418109304812367, guid: 3abf917109cd49c4b8c265a99d0859a8, type: 3}
@@ -941,7 +942,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!33 &2016005857
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -970,7 +971,7 @@ NavMeshAgent:
   m_AutoRepath: 1
   m_Height: 2
   m_BaseOffset: 0.5
-  m_WalkableMask: 4294967295
+  m_WalkableMask: 8
   m_ObstacleAvoidanceType: 4
 --- !u!23 &2016005860
 MeshRenderer:
@@ -1041,7 +1042,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67a40dd98d81aca4ba9caad8d076c8f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  goal: {fileID: 3936818930919239069}
 --- !u!4 &203723457245247224
 Transform:
   m_ObjectHideFlags: 0
@@ -1194,7 +1194,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6762057872826773760, guid: 4c315644ef411b148b5a97ecd3877808, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2239716641518270868, guid: 4c315644ef411b148b5a97ecd3877808, type: 3}
@@ -1315,28 +1315,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6762057872826773760, guid: 4c315644ef411b148b5a97ecd3877808, type: 3}
   m_PrefabInstance: {fileID: 4362266597321219836}
   m_PrefabAsset: {fileID: 0}
---- !u!195 &7644180017968805191
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7016121777094602748}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 1
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!114 &7644180017968805195
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1349,23 +1327,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67a40dd98d81aca4ba9caad8d076c8f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  goal: {fileID: 0}
---- !u!54 &7644180017968805196
-Rigidbody:
+--- !u!195 &7644180017968805198
+NavMeshAgent:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7016121777094602748}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 10
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0.5
+  m_WalkableMask: 8
+  m_ObstacleAvoidanceType: 4
+--- !u!64 &7644180017968805199
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7016121777094602748}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!33 &8876195704588533862
 MeshFilter:
   m_ObjectHideFlags: 0

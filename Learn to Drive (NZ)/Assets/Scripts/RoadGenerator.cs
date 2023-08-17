@@ -20,6 +20,8 @@ public class RoadGenerator : MonoBehaviour {
     public GameObject straightRoad;
     // Curved road prefab
     public GameObject curvedRoad;
+    // Alternative Curved Road 
+    public GameObject alternativeCurvedRoad;
     // Two roundabout prefab
     public GameObject twoRoundabout;
     // Three roundabout prefab
@@ -32,6 +34,9 @@ public class RoadGenerator : MonoBehaviour {
 
     // Previous player position
     private Vector3 lastPlayerPosition;
+
+    // Last instantiated 
+    public static Vector3 lastInstantiated = new Vector3(0, 0, 0);
 
     // Last value added to the dictionary
     public Vector3 lastRoad = new Vector3(0, 0, 0); // Redundant?
@@ -117,6 +122,7 @@ public class RoadGenerator : MonoBehaviour {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.1f);
                         } else {
                             // WAS 24.99 BEFORE
+                            roadType = alternativeCurvedRoad;
                             roadCoordinates = previousRoadCoordinates + new Vector3(-24.99f, 0, 0.188f);
                         }
                     } else if (previousRoad == "curved") {
@@ -124,6 +130,7 @@ public class RoadGenerator : MonoBehaviour {
                         if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-11.403f, 0, 48.131f);
                         } else {
+                            roadType = alternativeCurvedRoad;
                             roadCoordinates = previousRoadCoordinates + new Vector3(-35.8f, 0, 0.373f);
                         }
                     } else {
@@ -132,6 +139,7 @@ public class RoadGenerator : MonoBehaviour {
                             //Debug.Log("CURVED R!: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 59.37f);
                         } else {
+                            roadType = alternativeCurvedRoad;
                             //Debug.Log("CURVED R: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(-53.23f, 0, 0.19f);
                         }
@@ -234,6 +242,7 @@ public class RoadGenerator : MonoBehaviour {
                     GameObject roadPrefab = currentRoadInformation.GameObject;
                     Quaternion roadRotation = currentRoadInformation.Quaternion;
                     GameObject roadInstance = Instantiate(roadPrefab, roadCoordinate, roadRotation);
+                    lastInstantiated = roadCoordinate;
                     activeRoadCoordinates.Add(roadCoordinate);
                     activeRoadPrefabs[roadCoordinate] = roadInstance;
                     addedNewRoad = true;
@@ -245,32 +254,23 @@ public class RoadGenerator : MonoBehaviour {
                 foreach (NavMeshSurface existingSurface in existingNavMeshSurfaces) {
                     Destroy(existingSurface);
                 }
-                //NavMeshSurface navmesh = gameObject.AddComponent<NavMeshSurface>();
-                //navmesh.BuildNavMesh();
-                
+
                 // Add NavMeshSurface components for each desired NavMesh
                 NavMeshSurface leftLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface rightLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface combinedNavMesh = gameObject.AddComponent<NavMeshSurface>();
-                /*
-                                        NavMeshSurface leftLaneNavMesh = roadInstance.AddComponent<NavMeshSurface>();
-                NavMeshSurface rightLaneNavMesh = roadInstance.AddComponent<NavMeshSurface>();
-                NavMeshSurface combinedNavMesh = roadInstance.AddComponent<NavMeshSurface>();*/
-
-                // Set properties for the left lane NavMesh
-                //leftLaneNavMesh.collectObjects = CollectObjects.Volume;
                 
                 Debug.Log("BAKING?");
-                //leftLaneNavMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
                 leftLaneNavMesh.layerMask = LayerMask.GetMask("left");
+                // This SEEMS to be working, although does it even have any affect?
+                leftLaneNavMesh.defaultArea = 3;
                 leftLaneNavMesh.BuildNavMesh();
 
-                //rightLaneNavMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
                 rightLaneNavMesh.layerMask = LayerMask.GetMask("right");
+                rightLaneNavMesh.defaultArea = 4;
                 rightLaneNavMesh.BuildNavMesh();
 
                 // Set properties for the combined NavMesh
-                //combinedNavMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
                 combinedNavMesh.layerMask = LayerMask.GetMask("left", "right");
                 combinedNavMesh.BuildNavMesh();
             }
