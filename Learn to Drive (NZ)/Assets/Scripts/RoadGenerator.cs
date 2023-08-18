@@ -37,6 +37,8 @@ public class RoadGenerator : MonoBehaviour {
 
     // Last instantiated 
     public static Vector3 lastInstantiated = new Vector3(0, 0, 0);
+    // Last instantiated road
+    public static GameObject lastInstantiatedRoad = null;
 
     // Last value added to the dictionary
     public Vector3 lastRoad = new Vector3(0, 0, 0); // Redundant?
@@ -243,6 +245,7 @@ public class RoadGenerator : MonoBehaviour {
                     Quaternion roadRotation = currentRoadInformation.Quaternion;
                     GameObject roadInstance = Instantiate(roadPrefab, roadCoordinate, roadRotation);
                     lastInstantiated = roadCoordinate;
+                    lastInstantiatedRoad = roadInstance;
                     activeRoadCoordinates.Add(roadCoordinate);
                     activeRoadPrefabs[roadCoordinate] = roadInstance;
                     addedNewRoad = true;

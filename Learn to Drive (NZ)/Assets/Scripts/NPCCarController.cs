@@ -28,8 +28,51 @@ public class NPCCarController : MonoBehaviour
             endPosition = FindEndOfNavMesh();
             if (RoadGenerator.lastInstantiated != lastInstantiated) {
                 lastInstantiated = RoadGenerator.lastInstantiated;
-                Debug.Log(RoadGenerator.lastInstantiated);
-                agent.destination = RoadGenerator.lastInstantiated;
+                GameObject lastInstantiatedRoad = RoadGenerator.lastInstantiatedRoad;
+                if (lastInstantiatedRoad != null) {
+                    float furthestDistance = 0;
+                    Vector3 destinationCoordinates = RoadGenerator.lastInstantiated;
+                    //Debug.Log(lastInstantiatedRoad.gameObject.transform.childCount);
+                    foreach (Transform child in lastInstantiatedRoad.transform) {
+                        // Has children
+                        if (child.gameObject.transform.childCount > 0) {
+                            foreach (Transform grandchild in child) {
+                                //Debug.Log(grandchild.gameObject);
+                                if (grandchild.gameObject.layer == 6) {
+                                    // Left lane
+                                    Vector3 grandchildCoordinates = grandchild.gameObject.transform.position;
+                                    float distance = Vector3.Distance(grandchildCoordinates, Vector3.zero);
+                                    if (distance > furthestDistance) {
+                                        furthestDistance = distance;
+                                        destinationCoordinates = grandchildCoordinates;
+                                        Debug.Log(destinationCoordinates);
+                                        Debug.Log(grandchild.gameObject);
+                                        Debug.Log(child);
+                                    }
+                                } else if (grandchild.gameObject.layer == 7) {
+                                    // Right lane
+                                    //Debug.Log(grandchild.gameObject.transform.position);
+                                }
+                            }
+                        } else {
+                            // Doesn't have children
+                            if ((child.gameObject.layer) == 6) {
+                                // Left lane
+                                Vector3 childCoordinates = child.gameObject.transform.position;
+                                float distance = Vector3.Distance(childCoordinates, Vector3.zero);
+                                if (distance > furthestDistance) {
+                                    furthestDistance = distance;
+                                    destinationCoordinates = childCoordinates;
+                                }
+                            } else if ((child.gameObject.layer) == 7) {
+                                // Right lane
+                            }
+                        }
+                    }
+                    Debug.Log("FINISHED CHECKING!");
+                    Debug.Log(destinationCoordinates);
+                    agent.destination = destinationCoordinates;
+                }
             }
         }
     }
