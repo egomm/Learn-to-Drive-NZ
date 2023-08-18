@@ -36,23 +36,8 @@ public class NPCCarController : MonoBehaviour
                     foreach (Transform child in lastInstantiatedRoad.transform) {
                         // Has children
                         if (child.gameObject.transform.childCount > 0) {
-                            foreach (Transform grandchild in child) {
-                                //Debug.Log(grandchild.gameObject);
-                                if (grandchild.gameObject.layer == 6) {
-                                    // Left lane
-                                    Vector3 grandchildCoordinates = grandchild.gameObject.transform.position;
-                                    float distance = Vector3.Distance(grandchildCoordinates, Vector3.zero);
-                                    if (distance > furthestDistance) {
-                                        furthestDistance = distance;
-                                        destinationCoordinates = grandchildCoordinates;
-                                        Debug.Log(destinationCoordinates);
-                                        Debug.Log(grandchild.gameObject);
-                                        Debug.Log(child);
-                                    }
-                                } else if (grandchild.gameObject.layer == 7) {
-                                    // Right lane
-                                    //Debug.Log(grandchild.gameObject.transform.position);
-                                }
+                            if (child.name == "Empty") {
+                                destinationCoordinates = child.transform.position;
                             }
                         } else {
                             // Doesn't have children
