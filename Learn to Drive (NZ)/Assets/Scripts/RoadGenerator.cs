@@ -81,7 +81,7 @@ public class RoadGenerator : MonoBehaviour {
                 if (randomRoadGeneration < roundaboutFrequency && (i - previousRoundabout) > 1 && (i - previousCurve) > 1) {
                     // Roundabout
                     previousRoundabout = i;
-                    roadType = twoRoundabout; // Temporary
+                    roadType = fourRoundabout; //twoRoundabout; // Temporary
                     //Debug.Log("Roundabout: " + currentAngle);
                     //Debug.Log(previousRoadCoordinates);
                     if (previousRoad == "straight") {
