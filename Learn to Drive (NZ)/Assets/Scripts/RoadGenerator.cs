@@ -28,6 +28,12 @@ public class RoadGenerator : MonoBehaviour {
     public GameObject threeRoundabout;
     // Four roundabout prefab
     public GameObject fourRoundabout;
+    // Three intersection prefab (right)
+    public GameObject threeIntersectionRight;
+    // Three intersection prefab (left)
+    public GameObject threeIntersectionLeft;
+    // Four intersection
+    public GameObject fourIntersection;
 
     // Reference to the player
     public GameObject player;
@@ -52,9 +58,10 @@ public class RoadGenerator : MonoBehaviour {
     public static Dictionary<Vector3, GameObject> activeRoadPrefabs = new Dictionary<Vector3, GameObject>();
 
     // Roundabout frequency
-    private float roundaboutFrequency = 0.2f;//0.075f;
-    private float curveFrequency = 0.05f;//0.225f;
-    private float straightFrequency = 0.75f;//0.7f;
+    private float roundaboutFrequency = 0.1f;
+    private float curveFrequency = 0.05f;
+    private float intersectionFrequency = 0.15f;
+    private float straightFrequency = 0.7f;
 
     // Start is called before the first frame update
     void Start() {
@@ -81,9 +88,18 @@ public class RoadGenerator : MonoBehaviour {
                 if (randomRoadGeneration < roundaboutFrequency && (i - previousRoundabout) > 1 && (i - previousCurve) > 1) {
                     // Roundabout
                     previousRoundabout = i;
-                    roadType = fourRoundabout; //twoRoundabout; // Temporary
-                    //Debug.Log("Roundabout: " + currentAngle);
-                    //Debug.Log(previousRoadCoordinates);
+                    float twoRoundaboutFrequency = 0.15f;
+                    float threeRoundaboutFrequency = 0.40f;
+                    float fourRoundaboutFrequency = 0.45f;
+                    float randomRoundaboutGeneration = Random.Range(0f, 1f);
+                    Debug.Log(randomRoundaboutGeneration);
+                    if (randomRoundaboutGeneration < twoRoundaboutFrequency) {
+                        roadType = twoRoundabout;
+                    } else if (randomRoundaboutGeneration < twoRoundaboutFrequency + threeRoundaboutFrequency) {
+                        roadType = threeRoundabout;
+                    } else {
+                        roadType = fourRoundabout;
+                    }
                     if (previousRoad == "straight") {
                         if (currentAngle != 90) {
                             alternativeAngle = currentAngle + 90;
@@ -128,7 +144,6 @@ public class RoadGenerator : MonoBehaviour {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-24.99f, 0, 0.188f);
                         }
                     } else if (previousRoad == "curved") {
-                        //Debug.Log("Last curved: " + currentAngle);
                         if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-11.403f, 0, 48.131f);
                         } else {
@@ -138,15 +153,60 @@ public class RoadGenerator : MonoBehaviour {
                     } else {
                         // Roundabout (temp)
                         if (currentAngle == 270) {
-                            //Debug.Log("CURVED R!: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 59.37f);
                         } else {
                             roadType = alternativeCurvedRoad;
-                            //Debug.Log("CURVED R: " + currentAngle);
                             roadCoordinates = previousRoadCoordinates + new Vector3(-53.23f, 0, 0.19f);
                         }
                     }
                     previousRoad = "curved";
+                } else if (randomRoadGeneration < curveFrequency + roundaboutFrequency + intersectionFrequency) {
+                    // Intersection 
+                    Debug.Log("Need intersection");
+                    roadType = fourIntersection;
+                    //roadType = fourIntersection;
+                    // Test four intersection first
+                    /*if (previousRoad == "straight") {
+                        // change to switch case?
+                        if (currentAngle == 0 || currentAngle == 180) {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
+                        } else if (currentAngle == 270) {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-13.999f, 0, 0);
+                        } else {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(13.999f, 0, 0);
+                        }
+                        //Debug.Log("Last used ALT?: " + lastUsedAlternative);
+                        if (lastUsedAlternative) {
+                            //Debug.Log("LAst used ALT: " + currentAngle);
+                            alternativeAngle = currentAngle + 90;
+                            roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
+                        }
+                    } else if (previousRoad == "curved") {
+                        // The angle isn't being adjusted correctly
+                        // Angle 0 should? be fine
+                        if (currentAngle == 270) {
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-24.99f, 0, 0.182f);
+                        } else {
+                            currentAngle -= 90; // TEMP WAS ALTANGLE BEFORE
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.111f);
+                        }
+                    } else {
+                        // Roundabout (temp)
+                        //alternativeAngle = currentAngle + 90;
+                        if (currentAngle == 270) {
+                            //Debug.Log("Straight Roundabout!: " + currentAngle);
+                            roadCoordinates = previousRoadCoordinates + new Vector3(-42.2f, 0, 0);
+                            lastUsedAlternative = false;
+                        } else {
+                            //Debug.Log("Straight Roundabout: " + currentAngle);
+                            roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 42.2f);
+                            if (lastUsedAlternative) {
+                                //alternativeAngle = currentAngle + 90;
+                                //roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
+                            }
+                        }
+                    }*/
+                    //previousRoad = "intersection"; // change this to intersection four
                 } else {
                     // Straight road
                     roadType = straightRoad;
