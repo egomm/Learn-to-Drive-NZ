@@ -231,6 +231,8 @@ GameObject:
   - component: {fileID: 432900979}
   - component: {fileID: 432900980}
   - component: {fileID: 432900981}
+  - component: {fileID: 432900982}
+  - component: {fileID: 432900983}
   m_Layer: 0
   m_Name: Speedometer
   m_TagString: Untagged
@@ -384,6 +386,34 @@ MeshCollider:
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
 --- !u!64 &432900981
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432900975}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
+--- !u!64 &432900982
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432900975}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
+--- !u!64 &432900983
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -572,7 +602,7 @@ GameObject:
   - component: {fileID: 534669904}
   - component: {fileID: 534669903}
   - component: {fileID: 534669906}
-  - component: {fileID: 534669907}
+  - component: {fileID: 534669908}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -660,7 +690,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 4225705780856633362}
   offset: {x: 0, y: 40, z: 0}
---- !u!64 &534669907
+--- !u!64 &534669908
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -671,7 +701,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 1
+  m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
 --- !u!1001 &604045719
@@ -769,10 +799,10 @@ MonoBehaviour:
   alternativeCurvedRoad: {fileID: 5696862384850834263, guid: fd06d88d462fc1a448aeb85733124b02, type: 3}
   twoRoundabout: {fileID: 7666581963594541766, guid: 482907e9a366c7247bda70a3bd0fc600, type: 3}
   threeRoundabout: {fileID: 6040169592419103319, guid: 9a01b256595ef3b4999f356b257144b0, type: 3}
-  fourRoundabout: {fileID: 4252566615077451004, guid: b272975dca877584b915698883997225, type: 3}
+  fourRoundabout: {fileID: 268454727568724253, guid: df835f008753b234bb9aa8d064c95eec, type: 3}
   threeIntersectionRight: {fileID: 0}
   threeIntersectionLeft: {fileID: 0}
-  fourIntersection: {fileID: 1897360059254352762, guid: 34af280524d7668459819c0b2d9f7837, type: 3}
+  fourIntersection: {fileID: 4074746908927410158, guid: bbb355e8a70151b428642c777efb082c, type: 3}
   player: {fileID: 4461294101673359143}
   lastRoad: {x: 0, y: 0, z: 0}
 --- !u!4 &935019862
@@ -1226,7 +1256,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6762057872826773760, guid: 4c315644ef411b148b5a97ecd3877808, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2239716641518270868, guid: 4c315644ef411b148b5a97ecd3877808, type: 3}
@@ -1248,7 +1278,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!54 &4461294101673359144
 Rigidbody:
   m_ObjectHideFlags: 0
