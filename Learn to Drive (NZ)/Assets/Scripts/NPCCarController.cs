@@ -12,7 +12,7 @@ public class NPCCarController : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-
+        agent.areaMask = NavMesh.GetAreaFromName("left") | NavMesh.GetAreaFromName("turning");
         // Find a point at the end of the NavMesh initially
         endPosition = FindEndOfNavMesh();
         if (endPosition != Vector3.zero)
@@ -41,8 +41,8 @@ public class NPCCarController : MonoBehaviour
                             }
                         } else {
                             // Doesn't have children
-                            if ((child.gameObject.layer) == 6) {
-                                // Left lane
+                            if ((child.gameObject.layer) == 6 || (child.gameObject.layer) == 8) {
+                                // Left lane or turning
                                 Vector3 childCoordinates = child.gameObject.transform.position;
                                 float distance = Vector3.Distance(childCoordinates, Vector3.zero);
                                 if (distance > furthestDistance) {

@@ -167,18 +167,41 @@ public class RoadGenerator : MonoBehaviour {
                     previousIntersection = i;
                     roadCoordinates = previousRoadCoordinates + new Vector3(1, 0, 0);
                     Debug.Log("Need intersection: Current Angle: " + currentAngle + " Coordinates: " + roadCoordinates + " Previous: " + previousRoad);
-                    roadType = fourIntersection;
+                    //roadType = fourIntersection;
+                    string intersectionType = "threeIntersection";
                     //roadType = fourIntersection;
                     // Test four intersection first
-                    if (previousRoad == "straight") {
-                        if (currentAngle == 0 || currentAngle == 180) {
-                            roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
-                        } else if (currentAngle == 270) {
-                            roadCoordinates = previousRoadCoordinates + new Vector3(-13.999f, 0, 0);
+                    if (intersectionType == "fourIntersection") {
+                        roadType = fourIntersection;
+                        if (previousRoad == "straight") {
+                            if (currentAngle == 0 || currentAngle == 180) {
+                                roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
+                            } else if (currentAngle == 270) {
+                                roadCoordinates = previousRoadCoordinates + new Vector3(-13.999f, 0, 0);
+                            }
+                            if (lastUsedAlternative) {
+                                alternativeAngle = currentAngle + 90;
+                                roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
+                            }
                         }
-                        if (lastUsedAlternative) {
-                            alternativeAngle = currentAngle + 90;
-                            roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
+                    } else {
+                        roadType = threeIntersectionLeft;
+                        // Three intersection (type will depend if left or right)
+                        if (previousRoad == "straight") {
+                            if (currentAngle == 0 || currentAngle == 180) {
+                                //currentAngle += 90;
+                                roadType = threeIntersectionLeft;
+                                roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
+                            } else if (currentAngle == 270) {
+                                //currentAngle -= 90;
+                                roadType = threeIntersectionRight;
+                                roadCoordinates = previousRoadCoordinates + new Vector3(-13.999f, 0, 0);
+                            }
+                            if (lastUsedAlternative) {
+                                Debug.Log("LAST USED ALT!");
+                                alternativeAngle = currentAngle + 90;
+                                roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
+                            }
                         }
                     }
                     // Temp
@@ -290,6 +313,17 @@ public class RoadGenerator : MonoBehaviour {
             if (previousRoad == "roundabout") {
                 lastUsedAlternative = false;
             }
+            if (previousRoad == "fourIntersection") {
+                if (currentAngle == 0 || currentAngle == 180) {
+                    currentAngle -= 90;
+                    if (currentAngle == -90) {
+                        currentAngle = 270;
+                    } 
+                } else if (currentAngle == 270) {
+                    currentAngle = 0;
+                }
+                Debug.Log("CURRENT: " + currentAngle);
+            }
             //Debug.Log(angle);
             //Debug.Log(roadCoordinates);
             //Debug.Log(lastUsedAlternative);
@@ -339,6 +373,7 @@ public class RoadGenerator : MonoBehaviour {
                 // Add NavMeshSurface components for each desired NavMesh
                 NavMeshSurface leftLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface rightLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
+                NavMeshSurface turningNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface combinedNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 
                 Debug.Log("BAKING?");
@@ -351,8 +386,12 @@ public class RoadGenerator : MonoBehaviour {
                 rightLaneNavMesh.defaultArea = 4;
                 rightLaneNavMesh.BuildNavMesh();
 
+                turningNavMesh.layerMask = LayerMask.GetMask("turning");
+                turningNavMesh.defaultArea = 5;
+                turningNavMesh.BuildNavMesh();
+
                 // Set properties for the combined NavMesh
-                combinedNavMesh.layerMask = LayerMask.GetMask("left", "right");
+                combinedNavMesh.layerMask = LayerMask.GetMask("left", "right", "turning");
                 combinedNavMesh.BuildNavMesh();
             }
             // After adding new roads, remove far away roads

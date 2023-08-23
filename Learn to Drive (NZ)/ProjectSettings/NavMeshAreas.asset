@@ -15,7 +15,7 @@ NavMeshProjectSettings:
     cost: 1
   - name: right
     cost: 1
-  - name: 
+  - name: turning
     cost: 1
   - name: 
     cost: 1
