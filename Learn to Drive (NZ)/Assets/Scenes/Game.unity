@@ -799,10 +799,10 @@ MonoBehaviour:
   alternativeCurvedRoad: {fileID: 5696862384850834263, guid: fd06d88d462fc1a448aeb85733124b02, type: 3}
   twoRoundabout: {fileID: 7666581963594541766, guid: 482907e9a366c7247bda70a3bd0fc600, type: 3}
   threeRoundabout: {fileID: 6040169592419103319, guid: 9a01b256595ef3b4999f356b257144b0, type: 3}
-  fourRoundabout: {fileID: 268454727568724253, guid: df835f008753b234bb9aa8d064c95eec, type: 3}
-  threeIntersectionRight: {fileID: 0}
+  fourRoundabout: {fileID: 4252566615077451004, guid: b272975dca877584b915698883997225, type: 3}
+  threeIntersectionRight: {fileID: 687722480157283853, guid: 629e1915bd4cb3c4e8aba4920a434c99, type: 3}
   threeIntersectionLeft: {fileID: 0}
-  fourIntersection: {fileID: 4074746908927410158, guid: bbb355e8a70151b428642c777efb082c, type: 3}
+  fourIntersection: {fileID: 7759120624572882273, guid: 81c14b65c5a998b4a9062410765084a0, type: 3}
   player: {fileID: 4461294101673359143}
   lastRoad: {x: 0, y: 0, z: 0}
 --- !u!4 &935019862
