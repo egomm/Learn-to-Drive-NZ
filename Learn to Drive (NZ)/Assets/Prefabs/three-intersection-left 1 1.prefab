@@ -612,7 +612,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4252330725271698679}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Intersection_3_Way.008
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1354,7 +1354,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8653230308534405108}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Intersection_3_Way.007
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1470,7 +1470,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8687931349835135658}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Intersection_3_Way.004
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1904,7 +1904,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6338530945216784184}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Intersection_3_Way.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2387,7 +2387,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8220000913761349041}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Intersection_3_Way.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}

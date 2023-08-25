@@ -17,7 +17,7 @@ NavMeshProjectSettings:
     cost: 1
   - name: turning
     cost: 1
-  - name: 
+  - name: combined
     cost: 1
   - name: 
     cost: 1

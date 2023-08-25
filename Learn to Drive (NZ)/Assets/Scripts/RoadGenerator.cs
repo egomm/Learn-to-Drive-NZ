@@ -383,6 +383,7 @@ public class RoadGenerator : MonoBehaviour {
                 // Set properties for the combined NavMesh
                 // This used to be all three
                 combinedNavMesh.layerMask = LayerMask.GetMask("left", "right", "turning");
+                combinedNavMesh.defaultArea = 6;
                 combinedNavMesh.BuildNavMesh();
 
                 Debug.Log("BAKING?");

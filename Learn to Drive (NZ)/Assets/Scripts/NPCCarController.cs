@@ -12,7 +12,7 @@ public class NPCCarController : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        agent.areaMask = 3;
+        agent.areaMask = 1 << 3;
         // Find a point at the end of the NavMesh initially
         endPosition = FindEndOfNavMesh();
         if (endPosition != Vector3.zero) {

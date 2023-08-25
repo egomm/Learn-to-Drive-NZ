@@ -31,12 +31,14 @@ public class MoveCar : MonoBehaviour {
     }
 
     void OnCollisionEnter(Collision collision) {
-        Debug.Log("ENTERED: " + collision.gameObject.layer);
+        //Debug.Log("ENTERED: " + collision.gameObject.layer);
+        //NavMeshHit hit;
+        //Debug.Log(NavMesh.SamplePosition(transform.position, out hit, 0.5f, NavMesh.AllAreas));
         onNavMesh = !(collision.gameObject.layer == 0);
     }
 
     void OnCollisionExit(Collision collision) {
-        Debug.Log("EXIT: " + collision.gameObject.layer);
+        //Debug.Log("EXIT: " + collision.gameObject.layer);
         if (collision.gameObject.layer == 0) {
             onNavMesh = true;
         }
@@ -90,6 +92,8 @@ public class MoveCar : MonoBehaviour {
 
     void FixedUpdate() {
         if (transform.position.y < 0.1f) {
+            NavMeshHit hit;
+            onNavMesh = NavMesh.SamplePosition(transform.position, out hit, 0.5f, 1 << 3 | 1 << 4 | 1 << 6);
             if (onNavMesh) {
                 //lastValidPosition = transform.position;
                 lastValidPositions.Add(transform.position);
