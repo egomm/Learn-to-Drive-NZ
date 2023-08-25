@@ -93,7 +93,10 @@ public class MoveCar : MonoBehaviour {
     void FixedUpdate() {
         if (transform.position.y < 0.1f) {
             NavMeshHit hit;
-            onNavMesh = NavMesh.SamplePosition(transform.position, out hit, 0.5f, 1 << 3 | 1 << 4 | 1 << 6);
+            onNavMesh = NavMesh.SamplePosition(transform.position, out hit, 1f, 1 << 5); //&& transform.position.z > -5.5f;
+            if (!onNavMesh) {
+                Debug.Log("NOT ON? ROAD??");
+            }
             if (onNavMesh) {
                 //lastValidPosition = transform.position;
                 lastValidPositions.Add(transform.position);

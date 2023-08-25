@@ -54,7 +54,7 @@ public class NPCCarController : MonoBehaviour
                         }
                     }
                     Debug.Log("FINISHED CHECKING!");
-                    Debug.Log(destinationCoordinates);
+                    //Debug.Log(destinationCoordinates);
                     agent.destination = destinationCoordinates;
                 }
             }

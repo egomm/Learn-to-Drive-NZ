@@ -373,18 +373,12 @@ public class RoadGenerator : MonoBehaviour {
                 // Add NavMeshSurface components for each desired NavMesh
                 NavMeshSurface leftLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface rightLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
-                NavMeshSurface turningNavMesh = gameObject.AddComponent<NavMeshSurface>();
+                //NavMeshSurface turningNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface combinedNavMesh = gameObject.AddComponent<NavMeshSurface>();
 
                 //turningNavMesh.layerMask = LayerMask.GetMask("turning");
                 //turningNavMesh.defaultArea = 5;
                 //turningNavMesh.BuildNavMesh();
-
-                // Set properties for the combined NavMesh
-                // This used to be all three
-                combinedNavMesh.layerMask = LayerMask.GetMask("left", "right", "turning");
-                combinedNavMesh.defaultArea = 6;
-                combinedNavMesh.BuildNavMesh();
 
                 Debug.Log("BAKING?");
                 leftLaneNavMesh.layerMask = LayerMask.GetMask("left", "turning");
@@ -395,6 +389,14 @@ public class RoadGenerator : MonoBehaviour {
                 rightLaneNavMesh.layerMask = LayerMask.GetMask("right", "turning");
                 rightLaneNavMesh.defaultArea = 4;
                 rightLaneNavMesh.BuildNavMesh();
+
+                // Set properties for the combined NavMesh
+                combinedNavMesh.layerMask = LayerMask.GetMask("left", "right", "turning");
+                combinedNavMesh.defaultArea = 5;
+                combinedNavMesh.BuildNavMesh();
+                /*barrierNavMesh.layerMask = LayerMask.GetMask("barrier");
+                barrierNavMesh.defaultArea = 5;
+                barrierNavMesh.BuildNavMesh();*/
             }
             // After adding new roads, remove far away roads
             float squaredDistanceThreshold = 10000f; // (100 units)^2
