@@ -21,14 +21,48 @@ public class MoveCar : MonoBehaviour {
     private bool movingForward = false;
     private bool movingBackward = false;
 
-    Vector3 lastValidPosition = new Vector3(0, 0.07f, 0);
+    private bool onNavMesh = true;
+
+    private List<Vector3> lastValidPositions = new List<Vector3>();
 
     bool IsOnNavMesh(Vector3 position) {
         UnityEngine.AI.NavMeshHit hit;
         return NavMesh.SamplePosition(position, out hit, 0.1f, NavMesh.AllAreas);
     }
 
+    void OnCollisionEnter(Collision collision) {
+        Debug.Log("ENTERED: " + collision.gameObject.layer);
+        onNavMesh = !(collision.gameObject.layer == 0);
+    }
+
+    void OnCollisionExit(Collision collision) {
+        Debug.Log("EXIT: " + collision.gameObject.layer);
+        if (collision.gameObject.layer == 0) {
+            onNavMesh = true;
+        }
+    }
+
+    void OnCollisionStay(Collision collision) {
+        if (transform.position.y < 0.1f) {
+            /*int leftLayer = LayerMask.NameToLayer("left");
+            int rightLayer = LayerMask.NameToLayer("right");
+            int turningLayer = LayerMask.NameToLayer("turning");
+            int objectLayer = collision.gameObject.layer;
+            onNavMesh = (objectLayer == leftLayer || objectLayer == rightLayer || objectLayer == turningLayer);
+            Debug.Log(onNavMesh);
+            if (onNavMesh) {
+                lastValidPosition = transform.position;
+            } else {
+                transform.position = lastValidPosition;
+            }*/
+            //int objectLayer = collision.gameObject.layer;
+            //onNavMesh = objectLayer != 0;
+            //Debug.Log(onNavMesh);
+        }
+    }
+
     void Start() {
+        lastValidPositions.Add(new Vector3(0, 0.1f, 0));
         rb = GetComponent<Rigidbody>();
         //navAgent = GetComponent<NavMeshAgent>();
 
@@ -42,27 +76,26 @@ public class MoveCar : MonoBehaviour {
 
     bool CheckIfCarOnNavMesh() {
         NavMeshHit hit;
-        //int desiredNavMeshLayer = NavMesh.GetNavMeshLayerFromName("YourDesiredLayerName");
         return NavMesh.SamplePosition(transform.position, out hit, 0.5f, NavMesh.AllAreas);
-    }
-    
-    void OnCollisionEnter(Collision col) {
-        /*
-        This can be easily used to control when the player hits the barrier,
-        another car, a pedestrian, or crosses to the wrong side of the road
-        */
-        //Debug.Log(col.gameObject);
+        //int desiredNavMeshLayer = NavMesh.GetNavMeshLayerFromName("YourDesiredLayerName");
+        int leftLayer = LayerMask.NameToLayer("left");
+        int rightLayer = LayerMask.NameToLayer("right");
+        int turningLayer = LayerMask.NameToLayer("turning");
+        int objectLayer = gameObject.layer;
+        //Debug.Log(objectLayer);
+        //return true;
+       // return (objectLayer == leftLayer || objectLayer == rightLayer || objectLayer == turningLayer);
+        //return NavMesh.SamplePosition(transform.position, out hit, 0.5f, NavMesh.AllAreas);
     }
 
     void FixedUpdate() {
-        bool onNavMesh = false;
         if (transform.position.y < 0.1f) {
-            onNavMesh = CheckIfCarOnNavMesh();
             if (onNavMesh) {
-                lastValidPosition = transform.position;
+                //lastValidPosition = transform.position;
+                lastValidPositions.Add(transform.position);
             } else {
-                transform.position = lastValidPosition;
-                Debug.Log(lastValidPosition);
+                transform.position = lastValidPositions[lastValidPositions.Count - 1];
+                lastValidPositions.RemoveAt(lastValidPositions.Count - 1);
             }
         }
         // Temporary until a better system is devised

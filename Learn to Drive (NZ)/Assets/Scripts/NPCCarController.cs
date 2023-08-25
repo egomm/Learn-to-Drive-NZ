@@ -15,8 +15,7 @@ public class NPCCarController : MonoBehaviour
         agent.areaMask = 3;
         // Find a point at the end of the NavMesh initially
         endPosition = FindEndOfNavMesh();
-        if (endPosition != Vector3.zero)
-        {
+        if (endPosition != Vector3.zero) {
             agent.destination = endPosition; // Set the default destination to the end of the NavMesh
         }
     }

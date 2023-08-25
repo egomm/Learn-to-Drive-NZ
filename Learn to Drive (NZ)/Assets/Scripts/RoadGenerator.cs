@@ -382,7 +382,7 @@ public class RoadGenerator : MonoBehaviour {
 
                 // Set properties for the combined NavMesh
                 // This used to be all three
-                combinedNavMesh.layerMask = LayerMask.GetMask("left", "right");
+                combinedNavMesh.layerMask = LayerMask.GetMask("left", "right", "turning");
                 combinedNavMesh.BuildNavMesh();
 
                 Debug.Log("BAKING?");
