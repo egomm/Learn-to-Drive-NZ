@@ -126,6 +126,7 @@ public class RoadGenerator : MonoBehaviour {
                     previousRoad = "roundabout";
                 } else if (randomRoadGeneration < curveFrequency + roundaboutFrequency && (i - previousIntersection) > 2) {
                     // Curve: need to make this adjust to the coordinate
+                    // STILL NEED TO FIX
                     // If the current angle is 0 degrees, decrease it by 90 to 270 degrees
                     previousCurve = i;
                     // This needs work 
@@ -356,6 +357,8 @@ public class RoadGenerator : MonoBehaviour {
                 NavMeshSurface leftLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface rightLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface combinedNavMesh = gameObject.AddComponent<NavMeshSurface>();
+                NavMeshSurface onlyLeft = gameObject.AddComponent<NavMeshSurface>();
+                NavMeshSurface onlyRight = gameObject.AddComponent<NavMeshSurface>();
 
                 leftLaneNavMesh.layerMask = LayerMask.GetMask("left", "turning", "leftNPC");
                 leftLaneNavMesh.defaultArea = 3;
@@ -369,6 +372,16 @@ public class RoadGenerator : MonoBehaviour {
                 combinedNavMesh.layerMask = LayerMask.GetMask("left", "right", "turning");
                 combinedNavMesh.defaultArea = 5;
                 combinedNavMesh.BuildNavMesh();
+
+                // Set properties for the only left navmesh 
+                onlyLeft.layerMask = LayerMask.GetMask("left", "turning");
+                onlyLeft.defaultArea = 6;
+                onlyLeft.BuildNavMesh();
+
+                // Set properties for the only right navmesh 
+                onlyRight.layerMask = LayerMask.GetMask("right", "turning");
+                onlyRight.defaultArea = 7;
+                onlyRight.BuildNavMesh();
 
                 // Add cars onto this new road depending on what is 
                 Transform leftChildWithTargetTag = FindChildWithTagRecursively(roadInstance.transform, "SpawnLeft");

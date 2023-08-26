@@ -17,9 +17,9 @@ NavMeshProjectSettings:
     cost: 1
   - name: combined
     cost: 99
-  - name: 
+  - name: onlyLeft
     cost: 1
-  - name: 
+  - name: onlyRight
     cost: 1
   - name: 
     cost: 1
