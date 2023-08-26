@@ -8,6 +8,7 @@ public class NPCCarController : MonoBehaviour
     private NavMeshAgent agent;
     private Vector3 endPosition; // Store the end position
     private Vector3 lastInstantiated = new Vector3(0, 0, 0);
+    private float furthestRoad = 0;
 
     void Start()
     {
@@ -24,7 +25,7 @@ public class NPCCarController : MonoBehaviour
         NavMeshHit hit;
         if (NavMesh.SamplePosition(transform.position, out hit, 2.0f, NavMesh.AllAreas)) {
             // Update the end position dynamically during the update loop
-            endPosition = FindEndOfNavMesh();
+            endPosition = FindEndOfNavMesh();    
             if (RoadGenerator.lastInstantiated != lastInstantiated) {
                 lastInstantiated = RoadGenerator.lastInstantiated;
                 GameObject lastInstantiatedRoad = RoadGenerator.lastInstantiatedRoad;
@@ -55,10 +56,16 @@ public class NPCCarController : MonoBehaviour
                     }
                     Debug.Log("FINISHED CHECKING!");
                     //Debug.Log(destinationCoordinates);
+                    /*float roadDistance = Vector3.Distance(destinationCoordinates, transform.position);
+                    if (roadDistance >= furthestRoad) {
+                    furthestRoad = roadDistance;
+                    agent.destination = destinationCoordinates;
+                    }*/
                     agent.destination = destinationCoordinates;
                 }
             }
         }
+
     }
 
     Vector3 FindEndOfNavMesh()

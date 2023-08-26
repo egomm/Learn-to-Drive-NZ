@@ -101,7 +101,7 @@ public class RoadGenerator : MonoBehaviour {
                     } else {
                         roadType = fourRoundabout;
                     }
-                    if (previousRoad == "straight" || previousRoad == "fourIntersection") {
+                    if (previousRoad == "straight") {
                         if (currentAngle != 90) {
                             alternativeAngle = currentAngle + 90;
                         }
@@ -122,7 +122,7 @@ public class RoadGenerator : MonoBehaviour {
                         }
                     }
                     previousRoad = "roundabout";
-                } else if (randomRoadGeneration < curveFrequency + roundaboutFrequency) {
+                } else if (randomRoadGeneration < curveFrequency + roundaboutFrequency && (i - previousIntersection) > 1) {
                     // Curve: need to make this adjust to the coordinate
                     // If the current angle is 0 degrees, decrease it by 90 to 270 degrees
                     previousCurve = i;
@@ -135,7 +135,7 @@ public class RoadGenerator : MonoBehaviour {
                     }
                     roadType = curvedRoad;
                     // This needs to depend on the curve
-                    if (previousRoad == "straight" || previousRoad == "fourIntersection") {
+                    if (previousRoad == "straight") {
                         // This isn't accurate atm
                         if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.1f);
@@ -168,10 +168,10 @@ public class RoadGenerator : MonoBehaviour {
                     roadCoordinates = previousRoadCoordinates + new Vector3(1, 0, 0);
                     Debug.Log("Need intersection: Current Angle: " + currentAngle + " Coordinates: " + roadCoordinates + " Previous: " + previousRoad);
                     //roadType = fourIntersection;
-                    string intersectionType = "threeIntersection";
+                    float intersectionType = Random.Range(0f, 1f);
                     //roadType = fourIntersection;
                     // Test four intersection first
-                    if (intersectionType == "fourIntersection") {
+                    if (intersectionType < 0.2f) {
                         roadType = fourIntersection;
                         if (previousRoad == "straight") {
                             if (currentAngle == 0 || currentAngle == 180) {
@@ -183,6 +183,7 @@ public class RoadGenerator : MonoBehaviour {
                                 alternativeAngle = currentAngle + 90;
                                 roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
                             }
+                            previousRoad = "fourIntersection";
                         }
                     } else {
                         roadType = threeIntersectionLeft;
@@ -203,56 +204,13 @@ public class RoadGenerator : MonoBehaviour {
                                 roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
                             }
                         }
+                        previousRoad = "threeIntersection";
                     }
-                    // Temp
-                    previousRoad = "fourIntersection";
-
-                    /*if (previousRoad == "straight") {
-                        // change to switch case?
-                        if (currentAngle == 0 || currentAngle == 180) {
-                            roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
-                        } else if (currentAngle == 270) {
-                            roadCoordinates = previousRoadCoordinates + new Vector3(-13.999f, 0, 0);
-                        } else {
-                            roadCoordinates = previousRoadCoordinates + new Vector3(13.999f, 0, 0);
-                        }
-                        //Debug.Log("Last used ALT?: " + lastUsedAlternative);
-                        if (lastUsedAlternative) {
-                            //Debug.Log("LAst used ALT: " + currentAngle);
-                            alternativeAngle = currentAngle + 90;
-                            roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
-                        }
-                    } else if (previousRoad == "curved") {
-                        // The angle isn't being adjusted correctly
-                        // Angle 0 should? be fine
-                        if (currentAngle == 270) {
-                            roadCoordinates = previousRoadCoordinates + new Vector3(-24.99f, 0, 0.182f);
-                        } else {
-                            currentAngle -= 90; // TEMP WAS ALTANGLE BEFORE
-                            roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.111f);
-                        }
-                    } else {
-                        // Roundabout (temp)
-                        //alternativeAngle = currentAngle + 90;
-                        if (currentAngle == 270) {
-                            //Debug.Log("Straight Roundabout!: " + currentAngle);
-                            roadCoordinates = previousRoadCoordinates + new Vector3(-42.2f, 0, 0);
-                            lastUsedAlternative = false;
-                        } else {
-                            //Debug.Log("Straight Roundabout: " + currentAngle);
-                            roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 42.2f);
-                            if (lastUsedAlternative) {
-                                //alternativeAngle = currentAngle + 90;
-                                //roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
-                            }
-                        }
-                    }*/
-                    //previousRoad = "intersection"; // change this to intersection four
                 } else {
                     // Straight road
                     roadType = straightRoad;
                     // Check what the previous road was
-                    if (previousRoad == "straight" || previousRoad == "fourIntersection") {
+                    if (previousRoad == "straight" || previousRoad.Contains("Intersection")) {
                         // change to switch case?
                         if (currentAngle == 0 || currentAngle == 180) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
@@ -313,7 +271,7 @@ public class RoadGenerator : MonoBehaviour {
             if (previousRoad == "roundabout") {
                 lastUsedAlternative = false;
             }
-            if (previousRoad == "fourIntersection") {
+            if (previousRoad == "threeIntersection") {
                 if (currentAngle == 0 || currentAngle == 180) {
                     currentAngle -= 90;
                     if (currentAngle == -90) {

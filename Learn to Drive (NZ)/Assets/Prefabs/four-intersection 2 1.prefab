@@ -1064,7 +1064,7 @@ GameObject:
   - component: {fileID: 7598343340591846278}
   - component: {fileID: 5784725873899330180}
   - component: {fileID: 2100677845972811256}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Intersection.006
   m_TagString: Untagged
   m_Icon: {fileID: 0}
