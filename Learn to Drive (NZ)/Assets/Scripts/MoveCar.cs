@@ -11,6 +11,8 @@ public class MoveCar : MonoBehaviour {
     public float speed;
     [SerializeField] TextMeshProUGUI speedometerText;
 
+    public static Vector3 position = Vector3.zero;
+
     Vector3 rotationRight = new Vector3(0, 30, 0);
     Vector3 rotationLeft = new Vector3(0, -30, 0);
 
@@ -91,6 +93,7 @@ public class MoveCar : MonoBehaviour {
     }
 
     void FixedUpdate() {
+        position = transform.position;
         if (transform.position.y < 0.1f) {
             NavMeshHit hit;
             onNavMesh = NavMesh.SamplePosition(transform.position, out hit, 1f, 1 << 5); //&& transform.position.z > -5.5f;
@@ -101,8 +104,10 @@ public class MoveCar : MonoBehaviour {
                 //lastValidPosition = transform.position;
                 lastValidPositions.Add(transform.position);
             } else {
-                transform.position = lastValidPositions[lastValidPositions.Count - 1];
-                lastValidPositions.RemoveAt(lastValidPositions.Count - 1);
+                if (lastValidPositions.Count - 1 >= 0) {
+                    transform.position = lastValidPositions[lastValidPositions.Count - 1];
+                    lastValidPositions.RemoveAt(lastValidPositions.Count - 1);
+                }
             }
         }
         // Temporary until a better system is devised
