@@ -388,6 +388,7 @@ public class RoadManager : MonoBehaviour {
                 NavMeshSurface combinedNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface onlyLeft = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface onlyRight = gameObject.AddComponent<NavMeshSurface>();
+                NavMeshSurface carRight = gameObject.AddComponent<NavMeshSurface>();
 
                 leftLaneNavMesh.layerMask = LayerMask.GetMask("left", "turning", "leftNPC");
                 leftLaneNavMesh.defaultArea = 3;
@@ -411,6 +412,10 @@ public class RoadManager : MonoBehaviour {
                 onlyRight.layerMask = LayerMask.GetMask("right", "turning");
                 onlyRight.defaultArea = 7;
                 onlyRight.BuildNavMesh();
+
+                carRight.layerMask = LayerMask.GetMask("right");
+                carRight.defaultArea = 8; 
+                carRight.BuildNavMesh();
 
                 // Add cars onto this new road depending on what is 
                 Transform leftChildWithTargetTag = FindChildWithTagRecursively(roadInstance.transform, "SpawnLeft");
