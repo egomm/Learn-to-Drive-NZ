@@ -9,6 +9,7 @@ TagManager:
   - LeftCar
   - RightCar
   - NPC
+  - Junction
   layers:
   - Default
   - TransparentFX

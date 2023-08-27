@@ -68,7 +68,7 @@ public class RoadManager : MonoBehaviour {
 
     // Roundabout frequency
     private float roundaboutFrequency = 0.1f;
-    private float curveFrequency = 0.5f;//0.05f;
+    private float curveFrequency = 0.05f;
     private float intersectionFrequency = 0.15f;
     private float straightFrequency = 0.7f;
 
@@ -456,8 +456,6 @@ public class RoadManager : MonoBehaviour {
                 if (rightChildWithTargetTag != null) {
                     Debug.Log("Found child with target tag: " + rightChildWithTargetTag.position);
                     // Spawn car(s) here
-                    // What about barriers?
-                    // NEED TO SPAWN A RIGHT CAR!!
                     int angle = (int) rightChildWithTargetTag.eulerAngles.y;
                     float carTypeRandom = Random.Range(0f, 1f);
                     GameObject rightCarPrefab;
@@ -487,7 +485,7 @@ public class RoadManager : MonoBehaviour {
                 float spawnCarRandom = Random.Range(0f, 1f);
                 if (spawnCarRandom < 0.5f) {
                     if (leftSpawnTransform != null) {
-                        Quaternion carRotation = Quaternion.Euler(0, leftSpawnTransform.rotation.y - 180, 0);
+                        Quaternion carRotation = Quaternion.Euler(0, leftSpawnTransform.rotation.y, 0);
                         float carTypeRandom = Random.Range(0f, 1f);
                         GameObject leftCarPrefab;
                         if (carTypeRandom <= 0.5f) {
@@ -613,7 +611,7 @@ public class RoadManager : MonoBehaviour {
     }
 
     // This will get more laggy the further the player goes out, but shouldn't be too significant
-    Vector3 FindEndOfNavMeshOfRoad(GameObject roadObject) {
+    public static Vector3 FindEndOfNavMeshOfRoad(GameObject roadObject) {
         NavMeshHit hit;
         Vector3 furthestPoint = Vector3.zero;
         Vector3 origin = Vector3.zero;

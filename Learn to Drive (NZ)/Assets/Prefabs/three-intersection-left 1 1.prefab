@@ -1394,7 +1394,7 @@ GameObject:
   - component: {fileID: 4275498023583140973}
   m_Layer: 0
   m_Name: three-intersection-left 1 1
-  m_TagString: Untagged
+  m_TagString: Junction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
