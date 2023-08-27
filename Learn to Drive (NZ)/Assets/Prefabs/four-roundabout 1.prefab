@@ -507,9 +507,9 @@ GameObject:
   - component: {fileID: 7569484552089922198}
   - component: {fileID: 7687682003339098181}
   - component: {fileID: 6319128433699444386}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Right Lane.008
-  m_TagString: Untagged
+  m_TagString: SpawnLeft
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -606,9 +606,9 @@ GameObject:
   - component: {fileID: 4195587563285464549}
   - component: {fileID: 6475159896015110479}
   - component: {fileID: 6475159896015110476}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Right Lane.009
-  m_TagString: Untagged
+  m_TagString: SpawnLeft
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2285,9 +2285,9 @@ GameObject:
   - component: {fileID: 5288704659840508479}
   - component: {fileID: 5709462914944294280}
   - component: {fileID: 5288704659840508476}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Left Lane.006
-  m_TagString: Untagged
+  m_TagString: SpawnRight
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2681,9 +2681,9 @@ GameObject:
   - component: {fileID: 5994684063937411717}
   - component: {fileID: 5745535789160858434}
   - component: {fileID: 5994684063937411722}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Right Lane.007
-  m_TagString: Untagged
+  m_TagString: SpawnLeft
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3174,9 +3174,9 @@ GameObject:
   - component: {fileID: 5537317606443749750}
   - component: {fileID: 8089904136010998488}
   - component: {fileID: 6123260477358812104}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Right Lane.011
-  m_TagString: Untagged
+  m_TagString: SpawnLeft
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4157,7 +4157,7 @@ GameObject:
   - component: {fileID: 4656028089728797662}
   - component: {fileID: 5562474277663896282}
   - component: {fileID: 4656028089728797663}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Left Lane.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4306,7 +4306,7 @@ GameObject:
   - component: {fileID: 5656249851490987238}
   - component: {fileID: 7107956858115660509}
   - component: {fileID: 5656249851490987239}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Left Lane.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5194,9 +5194,9 @@ GameObject:
   - component: {fileID: 1034713070047422100}
   - component: {fileID: 229090548893449204}
   - component: {fileID: 5836463902011668204}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Right Lane.010
-  m_TagString: Untagged
+  m_TagString: SpawnLeft
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8296,7 +8296,7 @@ GameObject:
   - component: {fileID: 6543404493527246027}
   - component: {fileID: 1616873135081017241}
   - component: {fileID: 6543404493527246024}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Left Lane.005
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8493,7 +8493,7 @@ GameObject:
   - component: {fileID: 6641495457499740611}
   - component: {fileID: 3246702840243398841}
   - component: {fileID: 6641495457499740608}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Left Lane.003
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -152,13 +152,19 @@ public class MoveCar : MonoBehaviour {
             float turnSpeed  = 0.25f * currentSpeed;
 
             if (Input.GetKey("d")) {
-                Quaternion deltaRotationRight = Quaternion.Euler(rotationRight * turnSpeed * Time.deltaTime);
-                rb.MoveRotation(rb.rotation * deltaRotationRight);
+                Quaternion deltaRotationRight = Quaternion.Euler(0f, rotationRight.y * turnSpeed * Time.deltaTime, 0f);
+                Quaternion newRotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * deltaRotationRight;
+
+                // Set the new rotation while keeping x and z rotations at 0
+                transform.rotation = Quaternion.Euler(0f, newRotation.eulerAngles.y, 0f);
             }
 
             if (Input.GetKey("a")) {
-                Quaternion deltaRotationLeft = Quaternion.Euler(rotationLeft * turnSpeed * Time.deltaTime);
-                rb.MoveRotation(rb.rotation * deltaRotationLeft);
+                Quaternion deltaRotationLeft = Quaternion.Euler(0f, rotationLeft.y * turnSpeed * Time.deltaTime, 0f);
+                Quaternion newRotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f) * deltaRotationLeft;
+
+                // Set the new rotation while keeping x and z rotations at 0
+                transform.rotation = Quaternion.Euler(0f, newRotation.eulerAngles.y, 0f);
             }
         }
         speedometerText.SetText("Speed: " + (int) (Math.Abs(currentSpeed) * 3.6f) + " kmph");
