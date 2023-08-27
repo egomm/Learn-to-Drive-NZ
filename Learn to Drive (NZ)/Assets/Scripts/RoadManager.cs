@@ -53,6 +53,7 @@ public class RoadManager : MonoBehaviour {
     // For the NPC cars
     public static Vector3 navMeshStart = Vector3.zero;
     public static Vector3 navMeshEnd = Vector3.zero;
+    private int maxCarCount = 8;
 
     // Last value added to the dictionary
     public Vector3 lastRoad = new Vector3(0, 0, 0); // Redundant?
@@ -88,6 +89,12 @@ public class RoadManager : MonoBehaviour {
         int previousIntersection = 0;
         string previousRoad = "straight";
         bool lastUsedAlternative = false;
+        // Spawn four roads before the first road
+        for (int i = 0; i < 4; i++) {
+            Vector3 tempRoadCoordinates = new Vector3(0, 0, (i - 4) * 13.99f);
+            roadInformation.Add(tempRoadCoordinates, new RoadInformation(straightRoad, Quaternion.Euler(new Vector3(0, 0, 0))));
+            UpdateNearbyRoadCoordinates();
+        }
         for (int i = 0; i < roundCount; i++) {
             // Make sure there can only be a roundabout every 5 roads
             float randomRoadGeneration = Random.Range(0f, 1f);
@@ -135,10 +142,17 @@ public class RoadManager : MonoBehaviour {
                     // If the current angle is 0 degrees, decrease it by 90 to 270 degrees
                     previousCurve = i;
                     // This needs work 
+                    Debug.Log("CURVE: " + previousRoadCoordinates);
+                    Debug.Log("CHANGED: " + changedAngle);
+                    Debug.Log("ALT:" + lastUsedAlternative);
                     if (changedAngle) {
                         currentAngle = (currentAngle <= 90) ? 270 : currentAngle - 180;
                     } else {
-                        currentAngle = 270;
+                        if (currentAngle == 270) {
+                            currentAngle = 90;
+                        } else {
+                            currentAngle = 270;
+                        }
                         changedAngle = true;
                     }
                     roadType = curvedRoad;
@@ -146,10 +160,11 @@ public class RoadManager : MonoBehaviour {
                     if (previousRoad == "straight") {
                         // This isn't accurate atm
                         Debug.Log("CURRENT: " + currentAngle + ", " + previousRoadCoordinates);
+                        if (!changedAngle && currentAngle == 270) {
+                            currentAngle = 90; //???
+                            Debug.Log("Changed to 90");
+                        }
                         if (currentAngle == 270) {
-                            if (lastUsedAlternative) {
-                                alternativeAngle = 90; //???
-                            }
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.1f);
                         } else {
                             // WAS 24.99 BEFORE
@@ -166,10 +181,11 @@ public class RoadManager : MonoBehaviour {
                     } else {
                         // Roundabout (temp)
                         Debug.Log("CURRENT: " + currentAngle + ", " + previousRoadCoordinates);
+                        if (!changedAngle && currentAngle == 270) {
+                            currentAngle = 90; //???
+                            Debug.Log("Changed to 90!");
+                        }
                         if (currentAngle == 270) {
-                            if (lastUsedAlternative) {
-                                alternativeAngle = 90; //???
-                            }
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 59.37f);
                         } else {
                             roadType = alternativeCurvedRoad;
@@ -496,7 +512,7 @@ public class RoadManager : MonoBehaviour {
                 }
             }
             // After adding new roads, remove far away roads
-            float squaredDistanceThreshold = 15625f; // (125 units)^2
+            float squaredDistanceThreshold = 22500f; // (150 units)^2
             Vector3 playerPosition = player.transform.position;
             List<Vector3> coordinatesToRemove = new List<Vector3>();
             foreach (var roadCoordinate in activeRoadCoordinates) {
@@ -511,37 +527,29 @@ public class RoadManager : MonoBehaviour {
                 activeRoadPrefabs.Remove(coordinate);
             }
 
-            // Managed everything, so update the navmesh start/end positions
+            // Managed everything, so remove the overload of cars before updating update the navmesh start/end positions
+            GameObject[] cars = GameObject.FindGameObjectsWithTag("LeftCar");
+
+            // Check if the number of cars exceeds the maximum allowed count
+            if (cars.Length > maxCarCount) {
+                // Calculate distances of each car to Vector3.zero
+                float[] distancesToZero = new float[cars.Length];
+                for (int i = 0; i < cars.Length; i++) {
+                    distancesToZero[i] = Vector3.Distance(cars[i].transform.position, Vector3.zero);
+                }
+
+                // Sort cars based on distances
+                System.Array.Sort(distancesToZero, cars);
+
+                // Remove overflow cars beyond 8 cars
+                for (int i = maxCarCount; i < cars.Length; i++) {
+                    Destroy(cars[i]);
+                }
+            }
             navMeshStart = FindStartOfNavMesh();
             navMeshEnd = FindEndOfNavMesh();
         }
     }
-
-    /*Vector3 FindStartOfNavMesh() {
-        int layerMask = 7;
-        Vector3 origin = Vector3.zero;
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(origin, out hit, float.MaxValue, NavMesh.AllAreas)) {
-            Collider[] colliders = Physics.OverlapSphere(hit.position, 0.1f, layerMask);
-
-            Vector3 closestPoint = hit.position;
-            float closestDistance = float.MaxValue;
-
-            foreach (Collider collider in colliders) {
-                Vector3 pointOnCollider = collider.ClosestPoint(hit.position);
-                float distance = Vector3.Distance(hit.position, pointOnCollider);
-
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestPoint = pointOnCollider;
-                }
-            }
-
-            return closestPoint;
-        }
-
-        return Vector3.zero;
-    }*/
 
     Vector3 FindStartOfNavMesh() {
         var keys = activeRoadPrefabs.Keys;
@@ -639,7 +647,7 @@ public class RoadManager : MonoBehaviour {
         nearbyRoadCoordinates.Clear();
 
         // Calculate the squared distance 
-        float squaredDistanceThreshold = 10000f; // (100 units distance)^2
+        float squaredDistanceThreshold = 15625f; // (125 units distance)^2
         Vector3 playerPosition = player.transform.position;
 
         foreach (var roadCoordinate in roadInformation.Keys) {

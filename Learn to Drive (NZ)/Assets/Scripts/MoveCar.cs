@@ -65,6 +65,7 @@ public class MoveCar : MonoBehaviour {
         }
     }
 
+
     void Start() {
         lastValidPositions.Add(new Vector3(0, 0.1f, 0));
         rb = GetComponent<Rigidbody>();
@@ -96,7 +97,7 @@ public class MoveCar : MonoBehaviour {
         position = transform.position;
         if (transform.position.y < 0.1f) {
             NavMeshHit hit;
-            onNavMesh = NavMesh.SamplePosition(transform.position, out hit, 1f, 1 << 5); //&& transform.position.z > -5.5f;
+            onNavMesh = NavMesh.SamplePosition(transform.position, out hit, 1f, 1 << 5) && transform.position.z > -5.5f;
             if (!onNavMesh) {
                 Debug.Log("NOT ON? ROAD??");
             }
