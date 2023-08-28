@@ -23,9 +23,9 @@ NavMeshProjectSettings:
     cost: 1
   - name: carRight
     cost: 1
-  - name: 
+  - name: carLeft
     cost: 1
-  - name: 
+  - name: all
     cost: 1
   - name: 
     cost: 1

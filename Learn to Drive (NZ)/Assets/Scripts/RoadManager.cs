@@ -105,6 +105,11 @@ public class RoadManager : MonoBehaviour {
             float randomRoadGeneration = Random.Range(0f, 1f);
             GameObject roadType;
             int alternativeAngle = -1;
+            /* Although the coordinates seem random in here, the positions of the roads have been determined through excessive
+             * trialling and testing. These coordinates are determined by the angle of the previous road, what the previous
+             * road was, and what the current road is. It also accounts for roads like curves that will change the 
+             * current angle by 90 or 180 degrees dependent on the situation.
+            */
             if (i > 0) {
                 if (randomRoadGeneration < roundaboutFrequency && (i - previousRoundabout) > 3 && (i - previousIntersection) > 3 && (i - previousCurve) > 1) {
                     // Roundabout
@@ -142,14 +147,10 @@ public class RoadManager : MonoBehaviour {
                     }
                     previousRoad = "roundabout";
                 } else if (randomRoadGeneration < curveFrequency + roundaboutFrequency && (i - previousIntersection) > 2) {
-                    // Curve: need to make this adjust to the coordinate
-                    // STILL NEED TO FIX
+                    // Curve
                     // If the current angle is 0 degrees, decrease it by 90 to 270 degrees
                     previousCurve = i;
-                    // This needs work 
-                    Debug.Log("CURVE: " + previousRoadCoordinates);
-                    Debug.Log("CHANGED: " + changedAngle);
-                    Debug.Log("ALT:" + lastUsedAlternative);
+                    // Manage if the angle had been changed before (usually only for the first curve)
                     if (changedAngle) {
                         currentAngle = (currentAngle <= 90) ? 270 : currentAngle - 180;
                     } else {
@@ -163,16 +164,9 @@ public class RoadManager : MonoBehaviour {
                     roadType = curvedRoad;
                     // This needs to depend on the curve
                     if (previousRoad == "straight") {
-                        // This isn't accurate atm
-                        Debug.Log("CURRENT: " + currentAngle + ", " + previousRoadCoordinates);
-                        if (!changedAngle && currentAngle == 270) {
-                            currentAngle = 90; //???
-                            Debug.Log("Changed to 90");
-                        }
                         if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 31.1f);
                         } else {
-                            // WAS 24.99 BEFORE
                             roadType = alternativeCurvedRoad;
                             roadCoordinates = previousRoadCoordinates + new Vector3(-24.99f, 0, 0.188f);
                         }
@@ -184,12 +178,7 @@ public class RoadManager : MonoBehaviour {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-35.8f, 0, 0.373f);
                         }
                     } else {
-                        // Roundabout (temp)
-                        Debug.Log("CURRENT: " + currentAngle + ", " + previousRoadCoordinates);
-                        if (!changedAngle && currentAngle == 270) {
-                            currentAngle = 90; //???
-                            Debug.Log("Changed to 90!");
-                        }
+                        // Roundabout
                         if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-5.7f, 0, 59.37f);
                         } else {
@@ -222,11 +211,9 @@ public class RoadManager : MonoBehaviour {
                         // Three intersection (type will depend if left or right)
                         if (previousRoad == "straight") {
                             if (currentAngle == 0 || currentAngle == 180) {
-                                //currentAngle += 90;
                                 roadType = threeIntersectionLeft;
                                 roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
                             } else if (currentAngle == 270) {
-                                //currentAngle -= 90;
                                 roadType = threeIntersectionRight;
                                 roadCoordinates = previousRoadCoordinates + new Vector3(-13.999f, 0, 0);
                             }
@@ -242,7 +229,6 @@ public class RoadManager : MonoBehaviour {
                     roadType = straightRoad;
                     // Check what the previous road was
                     if (previousRoad == "straight" || previousRoad.Contains("Intersection")) {
-                        // change to switch case?
                         if (currentAngle == 0 || currentAngle == 180) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
                         } else if (currentAngle == 270) {
@@ -255,8 +241,6 @@ public class RoadManager : MonoBehaviour {
                             roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
                         }
                     } else if (previousRoad == "curved") {
-                        // The angle isn't being adjusted correctly
-                        // Angle 0 should? be fine
                         if (currentAngle == 270) {
                             roadCoordinates = previousRoadCoordinates + new Vector3(-24.99f, 0, 0.182f);
                         } else {
@@ -269,10 +253,6 @@ public class RoadManager : MonoBehaviour {
                             lastUsedAlternative = false;
                         } else {
                             roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 42.2f);
-                            if (lastUsedAlternative) {
-                                //alternativeAngle = currentAngle + 90;
-                                //roadCoordinates = previousRoadCoordinates + new Vector3(0, 0, 13.999f);
-                            }
                         }
                     }
                     previousRoad = "straight";
@@ -387,18 +367,22 @@ public class RoadManager : MonoBehaviour {
                     Destroy(existingSurface);
                 }
 
-                // Add NavMeshSurface components for each desired NavMesh
+                // Add NavMeshSurface components for each NavMesh
                 NavMeshSurface leftLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface rightLaneNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface combinedNavMesh = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface onlyLeft = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface onlyRight = gameObject.AddComponent<NavMeshSurface>();
                 NavMeshSurface carRight = gameObject.AddComponent<NavMeshSurface>();
+                NavMeshSurface carLeft = gameObject.AddComponent<NavMeshSurface>();
+                NavMeshSurface combinedAll = gameObject.AddComponent<NavMeshSurface>();
 
+                // Set properties for the left lane navmesh
                 leftLaneNavMesh.layerMask = LayerMask.GetMask("left", "turning", "leftNPC");
                 leftLaneNavMesh.defaultArea = 3;
                 leftLaneNavMesh.BuildNavMesh();
 
+                // Set properties for the right lane navmesh
                 rightLaneNavMesh.layerMask = LayerMask.GetMask("right", "turning", "rightNPC");
                 rightLaneNavMesh.defaultArea = 4;
                 rightLaneNavMesh.BuildNavMesh();
@@ -418,37 +402,28 @@ public class RoadManager : MonoBehaviour {
                 onlyRight.defaultArea = 7;
                 onlyRight.BuildNavMesh();
 
+                // Set properties for the car right navmesh
                 carRight.layerMask = LayerMask.GetMask("right");
                 carRight.defaultArea = 8; 
                 carRight.BuildNavMesh();
 
-                // Add cars onto this new road depending on what is 
+                // Set properties for the car left navmesh
+                carLeft.layerMask = LayerMask.GetMask("left");
+                carLeft.defaultArea = 9;
+                carLeft.BuildNavMesh();
+
+                // Set properties for the combined all navmesh
+                combinedAll.layerMask = LayerMask.GetMask("left", "turning", "leftNPC", "right", "rightNPC");
+                combinedAll.defaultArea = 10;
+                combinedAll.BuildNavMesh();
+
+                // Spawn cars on the spawn left tag
                 Transform leftChildWithTargetTag = FindChildWithTagRecursively(roadInstance.transform, "SpawnLeft");
                 Transform closestBarrier = null;
                 if (leftChildWithTargetTag != null) {
-                    Debug.Log("Found child with target tag: " + leftChildWithTargetTag.position);
-                    /*List<Transform> allBarriers = FindAllBarriersRecursively(roadInstance.transform);
-                    float closestBarrierDistance = -1;
-                    foreach (Transform barrier in allBarriers) {
-                        Debug.Log(barrier);
-                        Debug.Log(barrier.position);
-                        // Do something with each barrier Transform
-                        float barrierDistance = Vector3.Distance(barrier.position, leftChildWithTargetTag.position);
-                        if (closestBarrierDistance == -1) {
-                            closestBarrierDistance = barrierDistance;
-                            closestBarrier = barrier;
-                        } else if (barrierDistance < closestBarrierDistance) {
-                            closestBarrierDistance = barrierDistance;
-                            closestBarrier = barrier;
-                        }
-                    }
-                    if (closestBarrier != null) {
-                        Debug.Log("CLOSEST: " + closestBarrier.position);
-                    }*/
-                    // Spawn car(s) here
+                    // Spawn car here
                     int angle = (int) leftChildWithTargetTag.eulerAngles.y;
                     Vector3 addon = Vector3.zero;
-                    Debug.Log(angle);
                     float carTypeRandom = Random.Range(0f, 1f);
                     GameObject leftCarPrefab;
                     if (carTypeRandom <= 0.5f) {
@@ -457,15 +432,12 @@ public class RoadManager : MonoBehaviour {
                         leftCarPrefab = Instantiate(blackCarNPC, leftChildWithTargetTag.position + getAddon(angle), leftChildWithTargetTag.rotation);
                     }
                     leftCarPrefab.tag = "LeftCar";
-                    Debug.Log(leftChildWithTargetTag.position);
-                } else {
-                    Debug.Log("No child with target tag found.");
                 }
 
+                // Spawn cars on the spawn right tag
                 Transform rightChildWithTargetTag = FindChildWithTagRecursively(roadInstance.transform, "SpawnRight");
                 if (rightChildWithTargetTag != null) {
-                    Debug.Log("Found child with target tag: " + rightChildWithTargetTag.position);
-                    // Spawn car(s) here
+                    // Spawn car here
                     int angle = (int) rightChildWithTargetTag.eulerAngles.y;
                     float carTypeRandom = Random.Range(0f, 1f);
                     GameObject rightCarPrefab;
@@ -475,9 +447,6 @@ public class RoadManager : MonoBehaviour {
                         rightCarPrefab = Instantiate(blackCarNPC, rightChildWithTargetTag.position + getAddon(angle), rightChildWithTargetTag.rotation);
                     }
                     rightCarPrefab.tag = "RightCar";
-                    Debug.Log(rightChildWithTargetTag.position);
-                } else {
-                    Debug.Log("No child with target tag found.");
                 }
 
                 // Find the most recently placed right lane and spawn a car (only on a straight?)
@@ -491,7 +460,7 @@ public class RoadManager : MonoBehaviour {
                         rightSpawnTransform = child;
                     }
                 }
-                // THIS IS TOO MUCH
+
                 float spawnCarRandom = Random.Range(0f, 1f);
                 if (spawnCarRandom < 0.5f) {
                     if (leftSpawnTransform != null) {
@@ -583,7 +552,7 @@ public class RoadManager : MonoBehaviour {
         if (roadObject != null) {
             foreach (Transform child in roadObject.transform) {
                 Vector3 childPosition = child.position;
-                if (NavMesh.SamplePosition(childPosition, out hit, float.MaxValue, 1 << 7)) {
+                if (NavMesh.SamplePosition(childPosition, out hit, float.MaxValue, 1 << 8)) {
                     float distance = Vector3.Distance(Vector3.zero, hit.position);
                     if (distance < closestDistance) {
                         closestDistance = distance;
@@ -606,14 +575,16 @@ public class RoadManager : MonoBehaviour {
         return closestPoint;
     }
 
-
+    // Function for finding the end of the navmesh on the active roads
     Vector3 FindEndOfNavMesh() {
         var keys = activeRoadPrefabs.Keys;
         float furthestDistance = 0f;
         Vector3 furthestPoint = Vector3.zero;
+        // Iterate over all of the active roads 
         foreach (var key in keys) {
             Vector3 endOfRoad = FindEndOfNavMeshOfRoad(activeRoadPrefabs[key]);
             float distance = Vector3.Distance(Vector3.zero, endOfRoad);
+            // Check if this is further than the current furthest
             if (distance > furthestDistance) {
                 furthestDistance = distance;
                 furthestPoint = endOfRoad;
@@ -622,7 +593,7 @@ public class RoadManager : MonoBehaviour {
         return furthestPoint;
     }
 
-    // This will get more laggy the further the player goes out, but shouldn't be too significant
+    // Function for finding the end of the navmesh of a specific road 
     public static Vector3 FindEndOfNavMeshOfRoad(GameObject roadObject) {
         NavMeshHit hit;
         Vector3 furthestPoint = Vector3.zero;
@@ -632,8 +603,10 @@ public class RoadManager : MonoBehaviour {
         if (roadObject != null) {
             foreach (Transform child in roadObject.transform) {
                 Vector3 childPosition = child.position;
-                if (NavMesh.SamplePosition(childPosition, out hit, float.MaxValue, 1 << 6)) {
+                // Use a bitwise operation to match this with all of the left roads (id: 9)
+                if (NavMesh.SamplePosition(childPosition, out hit, float.MaxValue, 1 << 9)) {
                     float distance = Vector3.Distance(origin, hit.position);
+                    // Check if this is further than the current furthest
                     if (distance > furthestDistance) {
                         furthestDistance = distance;
                         furthestPoint = hit.position;

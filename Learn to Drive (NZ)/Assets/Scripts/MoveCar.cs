@@ -123,9 +123,6 @@ public class MoveCar : MonoBehaviour {
                     if (child.CompareTag("Junction")) {
                         if (child.transform.position == hit.collider.transform.parent.position) {
                             return true;
-                        } else {
-                            Debug.LogWarning(child.transform.position);
-                            Debug.LogWarning("AAA: " + hit.collider.transform.parent.position);
                         }
                     }
                 }
@@ -134,34 +131,15 @@ public class MoveCar : MonoBehaviour {
         return false;
     }
 
-    void OnCollisionExit(Collision collision) {
-        //Debug.Log("EXIT: " + collision.gameObject.layer);
-        if (collision.gameObject.layer == 0) {
-            onNavMesh = true;
-        }
-    }
-
-    void OnCollisionStay(Collision collision) {
-        if (transform.position.y < 0.1f) {
-            /*int leftLayer = LayerMask.NameToLayer("left");
-            int rightLayer = LayerMask.NameToLayer("right");
-            int turningLayer = LayerMask.NameToLayer("turning");
-            int objectLayer = collision.gameObject.layer;
-            onNavMesh = (objectLayer == leftLayer || objectLayer == rightLayer || objectLayer == turningLayer);
-            Debug.Log(onNavMesh);
-            if (onNavMesh) {
-                lastValidPosition = transform.position;
-            } else {
-                transform.position = lastValidPosition;
-            }*/
-            //int objectLayer = collision.gameObject.layer;
-            //onNavMesh = objectLayer != 0;
-            //Debug.Log(onNavMesh);
-        }
-    }
-
     private void DeactivatePanel() {
+        // Player failed 
+        if (playerScore < 50) {
+            Time.timeScale = 1;
+            SceneManager.LoadScene("Game Over");
+        }
+        // Unfreeze the game
         Time.timeScale = 1;
+        // Hide the warning
         warningPanel.SetActive(false);
     }
 
@@ -171,28 +149,6 @@ public class MoveCar : MonoBehaviour {
         confirmButton.onClick.AddListener(DeactivatePanel);
         lastValidPositions.Add(new Vector3(0, 0.1f, 0));
         rb = GetComponent<Rigidbody>();
-        //navAgent = GetComponent<NavMeshAgent>();
-
-        // Check if the car's starting position is on the NavMesh
-        if (!IsOnNavMesh(transform.position)) {
-            Debug.Log("Car's starting position is not on the NavMesh.");
-        } else {
-            Debug.Log("ON NAVMESH!");
-        }
-    }
-
-    bool CheckIfCarOnNavMesh() {
-        NavMeshHit hit;
-        return NavMesh.SamplePosition(transform.position, out hit, 0.5f, NavMesh.AllAreas);
-        //int desiredNavMeshLayer = NavMesh.GetNavMeshLayerFromName("YourDesiredLayerName");
-        int leftLayer = LayerMask.NameToLayer("left");
-        int rightLayer = LayerMask.NameToLayer("right");
-        int turningLayer = LayerMask.NameToLayer("turning");
-        int objectLayer = gameObject.layer;
-        //Debug.Log(objectLayer);
-        //return true;
-       // return (objectLayer == leftLayer || objectLayer == rightLayer || objectLayer == turningLayer);
-        //return NavMesh.SamplePosition(transform.position, out hit, 0.5f, NavMesh.AllAreas);
     }
 
     void FixedUpdate() {
@@ -209,7 +165,8 @@ public class MoveCar : MonoBehaviour {
         if (transform.position.y < 0.1f) {
             NavMeshHit hit;
             onNavMesh = NavMesh.SamplePosition(transform.position, out hit, 1f, 1 << 5) && transform.position.z > (maximumZValue - 25f) && transform.position.x < (minimumXValue + 25f);
-            if (!onNavMesh && canShowRoadWarning) {
+            bool onRoad = NavMesh.SamplePosition(transform.position, out hit, 1f, 1 << 10);
+            if (!onRoad && canShowRoadWarning) {
                 // Alert the player 
                 playerScore -= 5; 
                 warningText.text = "Stay on the road to avoid potential crashes.";
@@ -219,11 +176,20 @@ public class MoveCar : MonoBehaviour {
                 canShowRoadWarning = false;
                 StartCoroutine(ResetRoadWarningCooldown());
             }
+
+            // Maximum size of the list for memory
+            int maxPositions = 1000;
+
             if (onNavMesh) {
-                //lastValidPosition = transform.position;
                 lastValidPositions.Add(transform.position);
+
+                // Check if the list size exceeds the maximum allowed size
+                if (lastValidPositions.Count > maxPositions) {
+                    int excess = lastValidPositions.Count - maxPositions;
+                    lastValidPositions.RemoveRange(0, excess);
+                }
             } else {
-                if (lastValidPositions.Count - 1 >= 0) {
+                if (lastValidPositions.Count > 0) {
                     transform.position = lastValidPositions[lastValidPositions.Count - 1];
                     lastValidPositions.RemoveAt(lastValidPositions.Count - 1);
                 }
@@ -276,27 +242,30 @@ public class MoveCar : MonoBehaviour {
             lastStateTurn = true;
         }
 
-        // Toggle indicators
-        if (Time.time - lastUpdated > 0.2f) {
-            if (Input.GetKey(KeyCode.LeftArrow)) {
+        // Toggle indicators 
+        // Prevent the users from clicking too often
+        if (Input.GetKey(KeyCode.LeftArrow)) {
+            if (Time.time - lastUpdated > 0.2f) {
                 ToggleLeftIndicator();
                 if (turnLeft) {
                     hasIndicated = true;
                 }
-            } else if (Input.GetKey(KeyCode.RightArrow)) {
+                lastUpdated = Time.time;
+            }
+        } else if (Input.GetKey(KeyCode.RightArrow)) {
+            if (Time.time - lastUpdated > 0.2f) {
                 ToggleRightIndicator();
                 if (turnRight) {
                     hasIndicated = true;
                 }
+                lastUpdated = Time.time;
             }
-            lastUpdated = Time.time;
         }
 
         //GetComponent<Rigidbody>().AddForce(Vector3.down * 10E9f);
         if (Input.GetKey("w") && !movingBackward && currentSpeed >= 0 && onNavMesh) {
             if (movingForward && currentSpeed < speed) {
                 currentSpeed += 50f * Time.deltaTime * (float) Math.Exp(-0.4f * currentSpeed);
-                //Debug.Log((float)Math.Exp(-0.5f*currentSpeed));
                 if (currentSpeed > speed) {
                     currentSpeed = speed;
                 }
@@ -392,6 +361,8 @@ public class MoveCar : MonoBehaviour {
         NavMeshHit hitNavMesh;
         if (NavMesh.SamplePosition(transform.position, out hitNavMesh, 0.5f, 1 << 8) && canShowWrongSideWarning) {
             playerScore -= 10;
+            // The car will be warned if they are on the left side but aren't following the instructions
+            // Although this is fine as the car should be following the instructions in a driving test
             warningText.text = "Drive on the Left Side of the Road.";
             warningPanel.SetActive(true);
             // Freeze the game
@@ -424,12 +395,6 @@ public class MoveCar : MonoBehaviour {
             scoreColour = "yellow";
         }
         scoreText.text = $"Score: <color={scoreColour}>" + playerScore + "</color>";
-
-        // Player failed 
-        if (playerScore < 50) {
-            Time.timeScale = 1;
-            SceneManager.LoadScene("Game Over");
-        }
     }
 
     // The alert can show again after this time has been exceeded

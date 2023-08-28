@@ -212,11 +212,10 @@ public class NPCCarController : MonoBehaviour
 
     Transform DetectCurrentObjectUnderAgent() {
         // Cast a ray downwards from the NavMeshAgent's position
-        Ray ray = new Ray(agent.transform.position + Vector3.up * 0.1f, Vector3.down);
+        Ray ray = new Ray(agent.transform.position + Vector3.up, Vector3.down);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity))
-        {
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity)) {
             GameObject hitObject = hit.collider.gameObject;
             return GetUltimateParentOf(hitObject.transform);
         } else {
@@ -226,13 +225,11 @@ public class NPCCarController : MonoBehaviour
 
     Transform DetectSecondCurrentObjectUnderAgent() {
         // Cast a ray downwards from the NavMeshAgent's position
-        Ray ray = new Ray(agent.transform.position + Vector3.up * 0.1f, Vector3.down);
+        Ray ray = new Ray(agent.transform.position + Vector3.up, Vector3.down);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity))
-        {
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity)) {
             GameObject hitObject = hit.collider.gameObject;
-            Debug.Log(hitObject.transform);
             return GetPenultimateParentOf(hitObject.transform);
         } else {
             return null;
@@ -263,27 +260,7 @@ public class NPCCarController : MonoBehaviour
         return penultimateParent;
     }
 
-    // Only for left car atm
-    /*void OnCollisionEnter(Collision collision) {
-        if (gameObject.tag == "LeftCar") {
-            Transform parent = GetUltimateParentOf(collision.gameObject.transform);
-            Debug.Log("ENTERED: " + parent.name);
-            bool next = false;
-            foreach (var key in RoadManager.activeRoadPrefabs.Keys) {
-                //Debug.Log(RoadManager.activeRoadPrefabs[key]);
-                if (next) {
-                    Debug.Log("Next Road: " + RoadManager.activeRoadPrefabs[key].tag);
-                    break;
-                }
-                if (RoadManager.activeRoadPrefabs[key].Equals(parent.gameObject)) {
-                    Debug.Log("Has next");
-                    next = true;
-                }
-            }
-        }
-    }*/
-
-        // For left cars only currently
+    // Function for finding the car in the front with a given tag
     private Transform FindCarInFront(string tag) {
         Transform carInFront = null;
         float closestDistance = Mathf.Infinity;
@@ -303,7 +280,7 @@ public class NPCCarController : MonoBehaviour
                 Vector3 toCar = carObject.transform.position - transform.position;
                 float angleToCar = Vector3.Angle(transform.forward, toCar);
                 // Check if the car is in front and closer than the current closest car
-                if (angleToCar < 30f && toCar.magnitude < closestDistance) {
+                if (angleToCar < 15f && toCar.magnitude < closestDistance) {
                     carInFront = carObject.transform;
                     closestDistance = toCar.magnitude;
                 }
