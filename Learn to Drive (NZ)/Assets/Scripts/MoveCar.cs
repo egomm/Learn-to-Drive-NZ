@@ -5,6 +5,7 @@ using UnityEngine.AI;
 using TMPro;
 using System;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class MoveCar : MonoBehaviour {
     public Rigidbody rb;
@@ -34,7 +35,7 @@ public class MoveCar : MonoBehaviour {
 
     // Manage the player's score 
     public TextMeshProUGUI scoreText;
-    private int playerScore = 100;
+    public static int playerScore = 100;
 
     // Last stopped 
     Vector3 lastStopped = Vector3.zero;
@@ -45,6 +46,8 @@ public class MoveCar : MonoBehaviour {
     public GameObject warningPanel;
     private bool canShowFollowWarning = true;
     private bool canShowWrongSideWarning = true;
+    private bool canShowRoadWarning = true;
+    // This is calculated as a distance 
     private Vector3 lastIntersectionWarning = Vector3.zero;
 
     // HUD
@@ -162,8 +165,9 @@ public class MoveCar : MonoBehaviour {
         warningPanel.SetActive(false);
     }
 
-
     void Start() {
+        playerScore = 100;
+        position = Vector3.zero;
         confirmButton.onClick.AddListener(DeactivatePanel);
         lastValidPositions.Add(new Vector3(0, 0.1f, 0));
         rb = GetComponent<Rigidbody>();
@@ -205,8 +209,15 @@ public class MoveCar : MonoBehaviour {
         if (transform.position.y < 0.1f) {
             NavMeshHit hit;
             onNavMesh = NavMesh.SamplePosition(transform.position, out hit, 1f, 1 << 5) && transform.position.z > (maximumZValue - 25f) && transform.position.x < (minimumXValue + 25f);
-            if (!onNavMesh) {
-                Debug.Log("NOT ON? ROAD??");
+            if (!onNavMesh && canShowRoadWarning) {
+                // Alert the player 
+                playerScore -= 5; 
+                warningText.text = "Stay on the road to avoid potential crashes.";
+                warningPanel.SetActive(true);
+                // Freeze the game
+                Time.timeScale = 0;
+                canShowRoadWarning = false;
+                StartCoroutine(ResetRoadWarningCooldown());
             }
             if (onNavMesh) {
                 //lastValidPosition = transform.position;
@@ -223,15 +234,17 @@ public class MoveCar : MonoBehaviour {
         bool turnLeft = false;
         bool turnRight = false;
         foreach (var key in RoadManager.activeRoadPrefabs.Keys) {
-            string roadName = RoadManager.activeRoadPrefabs[key].name;
-            if (roadName.Contains("intersection-left")) {
-                // If within 30 blocks and after the player
-                if (Vector3.Distance(transform.position, key) < 30 && Vector3.Distance(Vector3.zero, key) > Vector3.Distance(Vector3.zero, transform.position)) {
-                    turnLeft = true;
-                }
-            } else if (roadName.Contains("intersection-right")) {
-                if (Vector3.Distance(transform.position, key) < 30 && Vector3.Distance(Vector3.zero, key) > Vector3.Distance(Vector3.zero, transform.position)) {
-                    turnRight = true;
+            if (RoadManager.activeRoadPrefabs[key] != null) {
+                string roadName = RoadManager.activeRoadPrefabs[key].name;
+                if (roadName.Contains("intersection-left")) {
+                    // If within 30 blocks and after the player
+                    if (Vector3.Distance(transform.position, key) < 30 && Vector3.Distance(Vector3.zero, key) > Vector3.Distance(Vector3.zero, transform.position)) {
+                        turnLeft = true;
+                    }
+                } else if (roadName.Contains("intersection-right")) {
+                    if (Vector3.Distance(transform.position, key) < 30 && Vector3.Distance(Vector3.zero, key) > Vector3.Distance(Vector3.zero, transform.position)) {
+                        turnRight = true;
+                    }
                 }
             }
         }
@@ -364,7 +377,7 @@ public class MoveCar : MonoBehaviour {
             Vector3 toCar = carObject.transform.position - transform.position;
             // Following too close
             if (toCar.magnitude < 4f && canShowFollowWarning) {
-                playerScore -= 3;
+                playerScore -= 5;
                 warningText.text = "Maintain a Safe Following Distance.";
                 warningPanel.SetActive(true);
                 // Freeze the game
@@ -392,7 +405,7 @@ public class MoveCar : MonoBehaviour {
             // Big range since the detection can be poor 
             if (Vector3.Distance(transform.position, lastStopped) > 20) {
                 playerScore -= 5;
-                warningText.text = "You must come to a complete stop at junctions (Roundabouts and Intersections).";
+                warningText.text = "You must come to a complete stop to give way at junctions (Roundabouts and Intersections).";
                 warningPanel.SetActive(true);
                 // Freeze the game
                 Time.timeScale = 0;
@@ -411,8 +424,15 @@ public class MoveCar : MonoBehaviour {
             scoreColour = "yellow";
         }
         scoreText.text = $"Score: <color={scoreColour}>" + playerScore + "</color>";
+
+        // Player failed 
+        if (playerScore < 50) {
+            Time.timeScale = 1;
+            SceneManager.LoadScene("Game Over");
+        }
     }
 
+    // The alert can show again after this time has been exceeded
     private IEnumerator ResetFollowWarningCooldown() {
         yield return new WaitForSeconds(2f);
         canShowFollowWarning = true;
@@ -421,5 +441,10 @@ public class MoveCar : MonoBehaviour {
     private IEnumerator ResetWrongSideWarningCooldown() {
         yield return new WaitForSeconds(2f);
         canShowWrongSideWarning = true;
+    }
+
+    private IEnumerator ResetRoadWarningCooldown() {
+        yield return new WaitForSeconds(2f);
+        canShowRoadWarning = true;
     }
 }

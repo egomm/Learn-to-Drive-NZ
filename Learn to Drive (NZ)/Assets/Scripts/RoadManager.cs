@@ -74,9 +74,14 @@ public class RoadManager : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-        /*for (int i = 0; i < 60; i++) {
-            Instantiate(straightRoad, new Vector3(0, 0, 13.999f*i), Quaternion.identity);
-        }*/
+        // Clear all statics
+        roadInformation.Clear();
+        activeRoadPrefabs.Clear();
+        navMeshStart = Vector3.zero;
+        navMeshEnd = Vector3.zero;
+        lastInstantiated = new Vector3(0, 0, 0);
+        lastInstantiatedRoad = null;
+
         // Generate between 600 and 800 roads
         int roundCount = Random.Range(600, 800);
         // Measure the current angle in degrees
@@ -575,24 +580,26 @@ public class RoadManager : MonoBehaviour {
         Vector3 closestPoint = Vector3.zero;
         float closestDistance = float.MaxValue;
 
-        foreach (Transform child in roadObject.transform) {
-            Vector3 childPosition = child.position;
-            if (NavMesh.SamplePosition(childPosition, out hit, float.MaxValue, 1 << 7)) {
-                float distance = Vector3.Distance(Vector3.zero, hit.position);
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestPoint = hit.position;
+        if (roadObject != null) {
+            foreach (Transform child in roadObject.transform) {
+                Vector3 childPosition = child.position;
+                if (NavMesh.SamplePosition(childPosition, out hit, float.MaxValue, 1 << 7)) {
+                    float distance = Vector3.Distance(Vector3.zero, hit.position);
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestPoint = hit.position;
+                    }
                 }
-            }
 
-            // Recurse into children
-            if (child.childCount > 0) {
-                Vector3 grandchildClosestPoint = FindStartOfNavMeshOfRoad(child.gameObject);
-                float grandchildDistance = Vector3.Distance(Vector3.zero, grandchildClosestPoint);
+                // Recurse into children
+                if (child.childCount > 0) {
+                    Vector3 grandchildClosestPoint = FindStartOfNavMeshOfRoad(child.gameObject);
+                    float grandchildDistance = Vector3.Distance(Vector3.zero, grandchildClosestPoint);
 
-                if (grandchildDistance < closestDistance) {
-                    closestDistance = grandchildDistance;
-                    closestPoint = grandchildClosestPoint;
+                    if (grandchildDistance < closestDistance) {
+                        closestDistance = grandchildDistance;
+                        closestPoint = grandchildClosestPoint;
+                    }
                 }
             }
         }
@@ -622,23 +629,25 @@ public class RoadManager : MonoBehaviour {
         Vector3 origin = Vector3.zero;
         float furthestDistance = 0f;
 
-        foreach (Transform child in roadObject.transform) {
-            Vector3 childPosition = child.position;
-            if (NavMesh.SamplePosition(childPosition, out hit, float.MaxValue, 1 << 6)) {
-                float distance = Vector3.Distance(origin, hit.position);
-                if (distance > furthestDistance) {
-                    furthestDistance = distance;
-                    furthestPoint = hit.position;
+        if (roadObject != null) {
+            foreach (Transform child in roadObject.transform) {
+                Vector3 childPosition = child.position;
+                if (NavMesh.SamplePosition(childPosition, out hit, float.MaxValue, 1 << 6)) {
+                    float distance = Vector3.Distance(origin, hit.position);
+                    if (distance > furthestDistance) {
+                        furthestDistance = distance;
+                        furthestPoint = hit.position;
+                    }
                 }
-            }
 
-            // Recurse into children
-            if (child.childCount > 0) {
-                Vector3 grandchildFurthestPoint = FindEndOfNavMeshOfRoad(child.gameObject);
-                float grandchildDistance = Vector3.Distance(origin, grandchildFurthestPoint);
-                if (grandchildDistance > furthestDistance) {
-                    furthestDistance = grandchildDistance;
-                    furthestPoint = grandchildFurthestPoint;
+                // Recurse into children
+                if (child.childCount > 0) {
+                    Vector3 grandchildFurthestPoint = FindEndOfNavMeshOfRoad(child.gameObject);
+                    float grandchildDistance = Vector3.Distance(origin, grandchildFurthestPoint);
+                    if (grandchildDistance > furthestDistance) {
+                        furthestDistance = grandchildDistance;
+                        furthestPoint = grandchildFurthestPoint;
+                    }
                 }
             }
         }
