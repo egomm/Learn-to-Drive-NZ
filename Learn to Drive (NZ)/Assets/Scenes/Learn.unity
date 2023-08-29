@@ -2020,14 +2020,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   straightRoad: {fileID: 5641843003947793379, guid: 8f0e4e5a44cff9243b1283062bf7bc97, type: 3}
-  curvedRoad: {fileID: 5696862384850834263, guid: e8d19cf05b2c45545adc6459b84c48f4, type: 3}
-  alternativeCurvedRoad: {fileID: 5696862384850834263, guid: fd06d88d462fc1a448aeb85733124b02, type: 3}
+  curvedRoad: {fileID: 5696862384850834263, guid: 2026ce54ec91c114abff29d7a9308409, type: 3}
+  alternativeCurvedRoad: {fileID: 5696862384850834263, guid: 04f860640ab226e4abd339ca214e2851, type: 3}
   twoRoundabout: {fileID: 7666581963594541766, guid: 482907e9a366c7247bda70a3bd0fc600, type: 3}
   threeRoundabout: {fileID: 6040169592419103319, guid: 9a01b256595ef3b4999f356b257144b0, type: 3}
   fourRoundabout: {fileID: 4252566615077451004, guid: b272975dca877584b915698883997225, type: 3}
-  threeIntersectionRight: {fileID: 687722480157283853, guid: 629e1915bd4cb3c4e8aba4920a434c99, type: 3}
+  threeIntersectionRight: {fileID: 687722480157283853, guid: 1729b27c5e21e4c44a706893707af3a9, type: 3}
   threeIntersectionLeft: {fileID: 4005097673127620926, guid: bf0f8c28950a36445add2ceec4b75f62, type: 3}
-  fourIntersection: {fileID: 2465592360673272123, guid: 0308b8b00a493d4429dd91d0c0f1deea, type: 3}
+  fourIntersection: {fileID: 2465592360673272123, guid: 27109dbee9a6e614aa6b923ef134a25b, type: 3}
   player: {fileID: 741382066}
   blueCarNPC: {fileID: 1863448424195559690, guid: 97586d466f764934aba9294e20e1c878, type: 3}
   blackCarNPC: {fileID: 3657222688384953593, guid: 06de5a05387d4f8418c0e035bdae0a8a, type: 3}
