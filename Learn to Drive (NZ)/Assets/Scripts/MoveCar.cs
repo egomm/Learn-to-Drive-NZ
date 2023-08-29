@@ -68,6 +68,14 @@ public class MoveCar : MonoBehaviour {
     private bool leftActive = false;
     private bool rightActive = false;
 
+    // For turning
+    private bool turnLeft = false;
+    private Vector3 turnLeftCoordinates = Vector3.zero;
+    private bool turnRight = false;
+    private Vector3 turnRightCoordinates = Vector3.zero;
+
+    List<Vector3> intersectionsPassed = new List<Vector3>(); 
+
     private float lastUpdated = 0;
 
     public void ToggleLeftIndicator() {
@@ -116,7 +124,19 @@ public class MoveCar : MonoBehaviour {
         // Perform the raycast
         if (Physics.Raycast(ray, out hit, Mathf.Infinity)) {
             Transform parent = GetUltimateParentOf(hit.collider.transform);
-            if (parent.CompareTag("Junction")) {
+            foreach (Transform child in parent) {
+                Debug.Log(child);
+                if (child.CompareTag("Junction")) {
+                    Transform colliderParent = hit.collider.transform.parent.transform;
+                    if (ReferenceEquals(child.transform, colliderParent) || ReferenceEquals(child.transform, colliderParent.parent.transform)) {
+                        Debug.LogWarning("FOUND: " + child);
+                        Debug.LogWarning(hit.collider.transform.parent);
+                        Debug.LogWarning(child.transform.position);
+                        return true;
+                    }
+                }
+            }
+            /*if (parent.CompareTag("Junction")) {
                 return true;
             } else {
                 foreach (Transform child in parent) {
@@ -126,7 +146,7 @@ public class MoveCar : MonoBehaviour {
                         }
                     }
                 }
-            }
+            }*/
         }
         return false;
     }
@@ -197,19 +217,38 @@ public class MoveCar : MonoBehaviour {
         }
 
         // Update the HUD text
-        bool turnLeft = false;
-        bool turnRight = false;
+        bool showTurnLeft = false;
+        bool showTurnRight = false;
         foreach (var key in RoadManager.activeRoadPrefabs.Keys) {
             if (RoadManager.activeRoadPrefabs[key] != null) {
                 string roadName = RoadManager.activeRoadPrefabs[key].name;
                 if (roadName.Contains("intersection-left")) {
                     // If within 30 blocks and after the player
                     if (Vector3.Distance(transform.position, key) < 30 && Vector3.Distance(Vector3.zero, key) > Vector3.Distance(Vector3.zero, transform.position)) {
-                        turnLeft = true;
+                        if (!intersectionsPassed.Contains(key)) {
+                            turnLeft = true;
+                            turnLeftCoordinates = key;//(key + transform.position) / 2f;
+                            intersectionsPassed.Add(key);
+                        } else {
+                            showTurnLeft = true;
+                        }
                     }
                 } else if (roadName.Contains("intersection-right")) {
                     if (Vector3.Distance(transform.position, key) < 30 && Vector3.Distance(Vector3.zero, key) > Vector3.Distance(Vector3.zero, transform.position)) {
-                        turnRight = true;
+                        if (!intersectionsPassed.Contains(key)) {
+                            turnRight = true;
+                            turnRightCoordinates = key;//(key + transform.position) / 2;
+                            intersectionsPassed.Add(key);
+                        } else {
+                            showTurnRight = true;
+                        }
+                    }
+                } else {
+                    if (Vector3.Distance(Vector3.zero, transform.position) > Vector3.Distance(Vector3.zero, turnLeftCoordinates)) {
+                        turnLeft = false; 
+                    }
+                    if (Vector3.Distance(Vector3.zero, transform.position) > Vector3.Distance(Vector3.zero, turnRightCoordinates)) {
+                        turnRight = false;
                     }
                 }
             }
@@ -236,6 +275,12 @@ public class MoveCar : MonoBehaviour {
                 rightActive = false;
                 UpdateIndicatorText();
             }
+        }
+
+        if (showTurnLeft) {
+            informationText.text = "Turn Left";
+        } else if (showTurnRight) {
+            informationText.text = "Turn Right";
         }
 
         if (turnLeft || turnRight) {
@@ -323,7 +368,14 @@ public class MoveCar : MonoBehaviour {
         int speedInKmph = (int) (Mathf.Abs(currentSpeed) * 3.6f);
 
         // Set the speed text with colored dynamic value
-        string speedColour = speedInKmph > 50 ? "red" : "green";
+        string speedColour = "green";
+        if (speedInKmph > 50) {
+            speedColour = "red";
+        } else if (speedInKmph >= 48) {
+            speedColour = "orange";
+        } else if (speedInKmph >= 45) {
+            speedColour = "yellow";
+        }
         speedometerText.text = $"Speed: <color={speedColour}>" + speedInKmph + "</color> kmph";
 
         // Check speed
