@@ -280,7 +280,7 @@ public class NPCCarController : MonoBehaviour
                 Vector3 toCar = carObject.transform.position - transform.position;
                 float angleToCar = Vector3.Angle(transform.forward, toCar);
                 // Check if the car is in front and closer than the current closest car
-                if (angleToCar < 15f && toCar.magnitude < closestDistance) {
+                if (angleToCar < 30f && toCar.magnitude < closestDistance) {
                     carInFront = carObject.transform;
                     closestDistance = toCar.magnitude;
                 }
