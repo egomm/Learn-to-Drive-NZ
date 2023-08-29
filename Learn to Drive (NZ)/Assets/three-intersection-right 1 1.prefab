@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3615409892613344484}
   m_Layer: 8
   m_Name: Intersection_3_Way.004
-  m_TagString: Untagged
+  m_TagString: Junction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -318,7 +318,7 @@ GameObject:
   - component: {fileID: 198324818677009591}
   m_Layer: 0
   m_Name: three-intersection-right 1 1
-  m_TagString: Junction
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -476,7 +476,7 @@ GameObject:
   - component: {fileID: 5083859813245384462}
   m_Layer: 0
   m_Name: Intersection_3_Way.006
-  m_TagString: Untagged
+  m_TagString: Junction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1044,7 +1044,7 @@ GameObject:
   - component: {fileID: 4207480576077251607}
   m_Layer: 0
   m_Name: Empty.004
-  m_TagString: Untagged
+  m_TagString: Junction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1452,7 +1452,7 @@ GameObject:
   - component: {fileID: 5857883104930254097}
   m_Layer: 0
   m_Name: Intersection_3_Way
-  m_TagString: Untagged
+  m_TagString: Junction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1597,7 +1597,7 @@ GameObject:
   - component: {fileID: 2429070197364090840}
   m_Layer: 0
   m_Name: Empty.003
-  m_TagString: Untagged
+  m_TagString: Junction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1859,7 +1859,7 @@ GameObject:
   - component: {fileID: 1665684844036324244}
   m_Layer: 0
   m_Name: Empty.001
-  m_TagString: Untagged
+  m_TagString: Junction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2446,7 +2446,7 @@ GameObject:
   - component: {fileID: 5912234540418571544}
   m_Layer: 8
   m_Name: Intersection_3_Way.001
-  m_TagString: Untagged
+  m_TagString: Junction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2492,7 +2492,7 @@ GameObject:
   - component: {fileID: 2428134615773308316}
   m_Layer: 0
   m_Name: Empty.002
-  m_TagString: Untagged
+  m_TagString: Junction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3094,7 +3094,7 @@ GameObject:
   - component: {fileID: 7260634551952184732}
   m_Layer: 6
   m_Name: Intersection_3_Way.002
-  m_TagString: Untagged
+  m_TagString: Junction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3481,7 +3481,7 @@ GameObject:
   - component: {fileID: 8526655841895646492}
   m_Layer: 0
   m_Name: Intersection_3_Way.005
-  m_TagString: Untagged
+  m_TagString: Junction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3627,7 +3627,7 @@ GameObject:
   - component: {fileID: 7769491191985886494}
   m_Layer: 0
   m_Name: Empty
-  m_TagString: Untagged
+  m_TagString: Junction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
