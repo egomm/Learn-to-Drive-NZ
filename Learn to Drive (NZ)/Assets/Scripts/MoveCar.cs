@@ -133,28 +133,13 @@ public class MoveCar : MonoBehaviour {
         if (Physics.Raycast(ray, out hit, Mathf.Infinity)) {
             Transform parent = GetUltimateParentOf(hit.collider.transform);
             foreach (Transform child in parent) {
-                Debug.Log(child);
                 if (child.CompareTag("Junction")) {
                     Transform colliderParent = hit.collider.transform.parent.transform;
                     if (ReferenceEquals(child.transform, colliderParent) || ReferenceEquals(child.transform, colliderParent.parent.transform)) {
-                        Debug.LogWarning("FOUND: " + child);
-                        Debug.LogWarning(hit.collider.transform.parent);
-                        Debug.LogWarning(child.transform.position);
                         return true;
                     }
                 }
             }
-            /*if (parent.CompareTag("Junction")) {
-                return true;
-            } else {
-                foreach (Transform child in parent) {
-                    if (child.CompareTag("Junction")) {
-                        if (child.transform.position == hit.collider.transform.parent.position) {
-                            return true;
-                        }
-                    }
-                }
-            }*/
         }
         return false;
     }
