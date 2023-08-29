@@ -11,7 +11,14 @@ public class MoveCar : MonoBehaviour {
     public Rigidbody rb;
     public Transform car;
     public float speed;
-    [SerializeField] TextMeshProUGUI speedometerText;
+    
+    // Speed text
+    public TextMeshProUGUI speedometerText;
+    public TextMeshProUGUI speedLimitText;
+
+    // Timer text 
+    public TextMeshProUGUI timerText;
+    public static float elapsedTime = 0f;
 
     public static Vector3 position = Vector3.zero;
 
@@ -44,6 +51,7 @@ public class MoveCar : MonoBehaviour {
     public Button confirmButton;
     public TextMeshProUGUI warningText;
     public GameObject warningPanel;
+    private bool canShowSpeedingWarning = true; 
     private bool canShowFollowWarning = true;
     private bool canShowWrongSideWarning = true;
     private bool canShowRoadWarning = true;
@@ -163,8 +171,16 @@ public class MoveCar : MonoBehaviour {
         warningPanel.SetActive(false);
     }
 
+    private string FormatTime(float time) {
+        int minutes = Mathf.FloorToInt(time / 60);
+        int seconds = Mathf.FloorToInt(time % 60);
+
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
     void Start() {
         playerScore = 100;
+        elapsedTime = 0;
         position = Vector3.zero;
         confirmButton.onClick.AddListener(DeactivatePanel);
         lastValidPositions.Add(new Vector3(0, 0.1f, 0));
@@ -377,14 +393,26 @@ public class MoveCar : MonoBehaviour {
             speedColour = "yellow";
         }
         speedometerText.text = $"Speed: <color={speedColour}>" + speedInKmph + "</color> kmph";
-
+        speedLimitText.text = $"Speed Limit: <color={speedColour}>50</color> kmph";
+        elapsedTime += Time.deltaTime;
+        string timeColour = "red";
+        if (elapsedTime >= 120) {
+            timeColour = "orange";
+        } else if (elapsedTime >= 240) {
+            timeColour = "yellow";
+        } else if (elapsedTime >= 360) {
+            timeColour = "green";
+        }
+        timerText.text = $"Time: <color={timeColour}>" + FormatTime(elapsedTime) + "</color>";
         // Check speed
-        if (speedInKmph > 50) {
+        if (speedInKmph > 50 && canShowSpeedingWarning) {
             playerScore -= 2;
             warningText.text = "Speeding is Dangerous: Slow down.";
             warningPanel.SetActive(true);
             // Freeze the game
             Time.timeScale = 0;
+            canShowSpeedingWarning = false;
+            StartCoroutine(ResetSpeedingWarningCooldown());
         }
 
         // Check following distance 
@@ -449,7 +477,12 @@ public class MoveCar : MonoBehaviour {
         scoreText.text = $"Score: <color={scoreColour}>" + playerScore + "</color>";
     }
 
-    // The alert can show again after this time has been exceeded
+    // The alert can show again after a time (in seconds) has been exceeded
+    private IEnumerator ResetSpeedingWarningCooldown() {
+        yield return new WaitForSeconds(2f);
+        canShowSpeedingWarning = true;
+    }
+
     private IEnumerator ResetFollowWarningCooldown() {
         yield return new WaitForSeconds(2f);
         canShowFollowWarning = true;

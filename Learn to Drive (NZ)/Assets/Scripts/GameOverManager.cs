@@ -6,17 +6,38 @@ using UnityEngine.SceneManagement;
 
 public class GameOverManager : MonoBehaviour {
     public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI timerText;
+
+    private string FormatTime(float time) {
+        int minutes = Mathf.FloorToInt(time / 60);
+        int seconds = Mathf.FloorToInt(time % 60);
+
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
     // Start is called before the first frame update
     void Start() {
-        string colour = "green";
+        // Score text 
+        string scoreColour = "green";
         if (MoveCar.playerScore < 50) {
-            colour = "red";
+            scoreColour = "red";
         } else if (MoveCar.playerScore < 70) {
-            colour = "orange";
+            scoreColour = "orange";
         } else if (MoveCar.playerScore < 90) {
-            colour = "yellow";
+            scoreColour = "yellow";
         }
-        scoreText.text = $"Score: <color={colour}>" + MoveCar.playerScore + "</color>";
+        scoreText.text = $"Score: <color={scoreColour}>" + MoveCar.playerScore + "</color>";
+
+        // Time text 
+        string timeColour = "red";
+        if (MoveCar.elapsedTime >= 120) {
+            timeColour = "orange";
+        } else if (MoveCar.elapsedTime >= 240) {
+            timeColour = "yellow";
+        } else if (MoveCar.elapsedTime >= 360) {
+            timeColour = "green";
+        }
+        timerText.text = $"Time: <color={timeColour}>" + FormatTime(MoveCar.elapsedTime) + "</color>";
     }
 
     public void MainMenu() {
