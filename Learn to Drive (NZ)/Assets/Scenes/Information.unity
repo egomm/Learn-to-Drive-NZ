@@ -774,16 +774,17 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Controls
 
-    Accelerate: W, Steer Left: A, Steer Right: D, Reverse: S,
-    Indicate Left: LEFT ARROW, Indicate Right: RIGHT ARROW, Confirm: LEFT CLICK
+    Accelerate: W, Brake: Release W, Steer Left: A, Steer Right:
+    D, Reverse: S, Indicate Left: LEFT ARROW, Indicate Right: RIGHT ARROW, Confirm:
+    LEFT CLICK
 
     Objectives
 
-    This
-    is an interactive game where you will start with a score of 100. Your objective
-    is to try to maintain this score as high as possible for as long as possible.
-    You can choose to end the game at any time by selecting ''Pause Learning''. The
-    game will automatically end if your score falls below 50. Good luck!'
+    This is an interactive game where you will start
+    with a score of 100. Your objective is to try to maintain this score as high
+    as possible for as long as possible. You can choose to end the game at any time
+    by selecting ''Pause Learning''. The game will automatically end if your score
+    falls below 50. Good luck!'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

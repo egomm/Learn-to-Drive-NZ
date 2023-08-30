@@ -8,8 +8,11 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class MoveCar : MonoBehaviour {
+    // Rigidbody of the car 
     public Rigidbody rb;
+    // Transform of the car 
     public Transform car;
+    // Speed of the car (maximum speed it can reach)
     public float speed;
     
     // Speed text
@@ -22,9 +25,9 @@ public class MoveCar : MonoBehaviour {
 
     public static Vector3 position = Vector3.zero;
 
+    // For the movements 
     Vector3 rotationRight = new Vector3(0, 30, 0);
     Vector3 rotationLeft = new Vector3(0, -30, 0);
-
     Vector3 forward = new Vector3(0, 0, 1);
     Vector3 backward = new Vector3(0, 0, -1);
 
@@ -32,6 +35,7 @@ public class MoveCar : MonoBehaviour {
     private bool movingForward = false;
     private bool movingBackward = false;
 
+    // Manage if the car is on the navmesh
     private bool onNavMesh = true;
 
     private List<Vector3> lastValidPositions = new List<Vector3>();
@@ -65,9 +69,6 @@ public class MoveCar : MonoBehaviour {
     public TextMeshProUGUI leftIndicatorText;
     public TextMeshProUGUI rightIndicatorText;
 
-    private bool usedLeft = false;
-    private bool usedRight = false;
-
     // Was the last state a turn? 
     private bool lastStateTurn = false;
 
@@ -86,6 +87,7 @@ public class MoveCar : MonoBehaviour {
 
     private float lastUpdated = 0;
 
+    // Function for toggling the left indicator 
     public void ToggleLeftIndicator() {
         leftActive = !leftActive;
         if (leftActive) {
@@ -94,6 +96,7 @@ public class MoveCar : MonoBehaviour {
         UpdateIndicatorText();
     }
 
+    // Function for toggling the right indicator
     public void ToggleRightIndicator() {
         rightActive = !rightActive;
         if (rightActive) {
@@ -102,27 +105,25 @@ public class MoveCar : MonoBehaviour {
         UpdateIndicatorText();
     }
 
-    void UpdateIndicatorText()
-    {
+    // Function for updating the indicator text 
+    void UpdateIndicatorText() {
+        // The text is green if the player is indicating else the text is red
         leftIndicatorText.text = leftActive ? "<color=green>Indicating Left</color>" : "<color=red>Indicating Left</color>";
         rightIndicatorText.text = rightActive ? "<color=green>Indicating Right</color>" : "<color=red>Indicating Right</color>";
     }
 
-    bool IsOnNavMesh(Vector3 position) {
-        UnityEngine.AI.NavMeshHit hit;
-        return NavMesh.SamplePosition(position, out hit, 0.1f, NavMesh.AllAreas);
-    }
-
+    // Function for getting the ultimate parent of a child object 
     Transform GetUltimateParentOf(Transform child) {
         Transform parent = child.parent;
-        while (parent != null)
-        {
+        // Keep checking the parent until there are no more parents 
+        while (parent != null) {
             child = parent;
             parent = parent.parent;
         }
         return child;
     }
 
+    // Use a raycast to check if there is a junction under the player (the car)
     bool CheckForJunctionUnderCar() {
         RaycastHit hit;
 
@@ -133,8 +134,10 @@ public class MoveCar : MonoBehaviour {
         if (Physics.Raycast(ray, out hit, Mathf.Infinity)) {
             Transform parent = GetUltimateParentOf(hit.collider.transform);
             foreach (Transform child in parent) {
+                // Check if the child has a junction tag
                 if (child.CompareTag("Junction")) {
                     Transform colliderParent = hit.collider.transform.parent.transform;
+                    // Return if the junction found matches with the colliders parent, or the parent of the colliders 
                     if (ReferenceEquals(child.transform, colliderParent) || ReferenceEquals(child.transform, colliderParent.parent.transform)) {
                         return true;
                     }
@@ -144,18 +147,19 @@ public class MoveCar : MonoBehaviour {
         return false;
     }
 
-    private void DeactivatePanel() {
-        // Player failed 
-        if (playerScore < 50) {
-            Time.timeScale = 1;
-            SceneManager.LoadScene("Game Over");
-        }
+    // Deactive the warning panel 
+    private void DeactivateWarningPanel() {
         // Unfreeze the game
         Time.timeScale = 1;
+        if (playerScore < 50) {
+            // Player failed 
+            SceneManager.LoadScene("Game Over");
+        }
         // Hide the warning
         warningPanel.SetActive(false);
     }
 
+    // Function for formatting the time into minutes:seconds
     private string FormatTime(float time) {
         int minutes = Mathf.FloorToInt(time / 60);
         int seconds = Mathf.FloorToInt(time % 60);
@@ -164,44 +168,56 @@ public class MoveCar : MonoBehaviour {
     }
 
     void Start() {
+        // Clear all the static variables
         playerScore = 100;
         elapsedTime = 0;
         position = Vector3.zero;
-        confirmButton.onClick.AddListener(DeactivatePanel);
+        // Add a button click listener
+        confirmButton.onClick.AddListener(DeactivateWarningPanel);
         lastValidPositions.Add(new Vector3(0, 0.1f, 0));
         rb = GetComponent<Rigidbody>();
     }
 
     void FixedUpdate() {
         position = transform.position;
-        if (currentSpeed < 1f) {
+        if (currentSpeed == 0f) {
+            // The last position where the player's car came to a stop
             lastStopped = transform.position;
         }
+
+        // Ensure that the player can't drive back to the start position
         if (position.z > maximumZValue) {
             maximumZValue = position.z; 
         }
         if (position.x < minimumXValue) {
             minimumXValue = position.x;
         }
+
+        // Wait until the player is on the ground
         if (transform.position.y < 0.1f) {
             NavMeshHit hit;
+            // Check if the player is on the navmesh (to constrain movement)
             onNavMesh = NavMesh.SamplePosition(transform.position, out hit, 1f, 1 << 5) && transform.position.z > (maximumZValue - 25f) && transform.position.x < (minimumXValue + 25f);
+            // Check if the player is on the road (to alert the player)
             bool onRoad = NavMesh.SamplePosition(transform.position, out hit, 1f, 1 << 10);
             if (!onRoad && canShowRoadWarning) {
-                // Alert the player 
+                // Alert the player and minus off 5 score
                 playerScore -= 5; 
                 warningText.text = "Stay on the road to avoid potential crashes.";
                 warningPanel.SetActive(true);
                 // Freeze the game
                 Time.timeScale = 0;
                 canShowRoadWarning = false;
+                // Reset the warning after 2 seconds
                 StartCoroutine(ResetRoadWarningCooldown());
             }
 
             // Maximum size of the list for memory
             int maxPositions = 1000;
 
+            // Manage if the player is on navmesh
             if (onNavMesh) {
+                // Add the current position of the player to the list of valid positions
                 lastValidPositions.Add(transform.position);
 
                 // Check if the list size exceeds the maximum allowed size
@@ -210,8 +226,10 @@ public class MoveCar : MonoBehaviour {
                     lastValidPositions.RemoveRange(0, excess);
                 }
             } else {
+                // If the player is not on navmesh, make sure they go back onto navmesh
                 if (lastValidPositions.Count > 0) {
                     transform.position = lastValidPositions[lastValidPositions.Count - 1];
+                    // Remove this position from the list of valid positions as it has already been checked
                     lastValidPositions.RemoveAt(lastValidPositions.Count - 1);
                 }
             }
@@ -224,27 +242,29 @@ public class MoveCar : MonoBehaviour {
             if (RoadManager.activeRoadPrefabs[key] != null) {
                 string roadName = RoadManager.activeRoadPrefabs[key].name;
                 if (roadName.Contains("intersection-left")) {
-                    // If within 30 blocks and after the player
+                    // If the intersection is within 30 units and is after the player position, alert the player that there is an intersection soon 
                     if (Vector3.Distance(transform.position, key) < 30 && Vector3.Distance(Vector3.zero, key) > Vector3.Distance(Vector3.zero, transform.position)) {
                         if (!intersectionsPassed.Contains(key)) {
                             turnLeft = true;
-                            turnLeftCoordinates = key;//(key + transform.position) / 2f;
+                            turnLeftCoordinates = key;
                             intersectionsPassed.Add(key);
                         } else {
                             showTurnLeft = true;
                         }
                     }
                 } else if (roadName.Contains("intersection-right")) {
+                    // If the intersection is within 30 units and is after the player position, alert the player that there is an intersection soon 
                     if (Vector3.Distance(transform.position, key) < 30 && Vector3.Distance(Vector3.zero, key) > Vector3.Distance(Vector3.zero, transform.position)) {
                         if (!intersectionsPassed.Contains(key)) {
                             turnRight = true;
-                            turnRightCoordinates = key;//(key + transform.position) / 2;
+                            turnRightCoordinates = key;
                             intersectionsPassed.Add(key);
                         } else {
                             showTurnRight = true;
                         }
                     }
                 } else {
+                    // Stop alerting the player of an upcoming intersection if the player has passed the intersection
                     if (Vector3.Distance(Vector3.zero, transform.position) > Vector3.Distance(Vector3.zero, turnLeftCoordinates)) {
                         turnLeft = false; 
                     }
@@ -255,6 +275,7 @@ public class MoveCar : MonoBehaviour {
             }
         }
 
+        // Display the text depending on if an intersetion is coming up
         if (turnLeft) {
             informationText.text = "Turn Left";
         } else if (turnRight) {
@@ -263,7 +284,7 @@ public class MoveCar : MonoBehaviour {
             informationText.text = "Continue Straight";
             if (lastStateTurn) {
                 if (!hasIndicated) {
-                    // alert 
+                    // Alert the player and minus off 5 score 
                     playerScore -= 5;
                     warningText.text = "You must indicate when turning at an intersection.";
                     warningPanel.SetActive(true);
@@ -278,6 +299,8 @@ public class MoveCar : MonoBehaviour {
             }
         }
 
+        // If the player reversed backwards, alert the player to turn
+        // No penalty for making the same mistake twice on the same intersection
         if (showTurnLeft) {
             informationText.text = "Turn Left";
         } else if (showTurnRight) {
@@ -289,7 +312,7 @@ public class MoveCar : MonoBehaviour {
         }
 
         // Toggle indicators 
-        // Prevent the users from clicking too often
+        // Prevent the users from clicking too often with a 200ms delay
         if (Input.GetKey(KeyCode.LeftArrow)) {
             if (Time.time - lastUpdated > 0.2f) {
                 ToggleLeftIndicator();
@@ -311,6 +334,7 @@ public class MoveCar : MonoBehaviour {
         //GetComponent<Rigidbody>().AddForce(Vector3.down * 10E9f);
         if (Input.GetKey("w") && !movingBackward && currentSpeed >= 0 && onNavMesh) {
             if (movingForward && currentSpeed < speed) {
+                // Increase the current speed based on a negative exponential model
                 currentSpeed += 50f * Time.deltaTime * (float) Math.Exp(-0.4f * currentSpeed);
                 if (currentSpeed > speed) {
                     currentSpeed = speed;
@@ -321,7 +345,7 @@ public class MoveCar : MonoBehaviour {
             movingForward = false;
         }
         if (Input.GetKey("s") && !movingForward && currentSpeed <= 0 && onNavMesh) {
-            //transform.Translate(backward * currentSpeed * Time.deltaTime);
+            // Decrease the current speed based on a positive exponential model
             currentSpeed -= 10f * Time.deltaTime * (float) Math.Exp(0.4f * currentSpeed);
             movingBackward = true;
         } else {
@@ -344,6 +368,7 @@ public class MoveCar : MonoBehaviour {
             }
         }
         transform.Translate(forward * currentSpeed * Time.deltaTime);
+        // Allow for the player to turn if the player isnt stationary
         if (currentSpeed != 0) {
             // Base turn speed of 2.5
             float turnSpeed = 2.5f + 0.2f * currentSpeed;
@@ -368,7 +393,7 @@ public class MoveCar : MonoBehaviour {
         // Calculate speed in kmph
         int speedInKmph = (int) (Mathf.Abs(currentSpeed) * 3.6f);
 
-        // Set the speed text with colored dynamic value
+        // Set the speed text with coloured text depending on the player's speed
         string speedColour = "green";
         if (speedInKmph > 50) {
             speedColour = "red";
@@ -379,7 +404,10 @@ public class MoveCar : MonoBehaviour {
         }
         speedometerText.text = $"Speed: <color={speedColour}>" + speedInKmph + "</color> kmph";
         speedLimitText.text = $"Speed Limit: <color={speedColour}>50</color> kmph";
+
+        // Increment the elapsed time by the time since the last frame 
         elapsedTime += Time.deltaTime;
+        // Set the timer text with coloured text depending on the elapsed time
         string timeColour = "red";
         if (elapsedTime >= 120) {
             timeColour = "orange";
@@ -391,22 +419,21 @@ public class MoveCar : MonoBehaviour {
         timerText.text = $"Time: <color={timeColour}>" + FormatTime(elapsedTime) + "</color>";
         // Check speed
         if (speedInKmph > 50 && canShowSpeedingWarning) {
+            // Warn the player and decrease the player score by 2
             playerScore -= 2;
             warningText.text = "Speeding is Dangerous: Slow down.";
             warningPanel.SetActive(true);
             // Freeze the game
             Time.timeScale = 0;
             canShowSpeedingWarning = false;
+            // Allow for this warning to show again after 2 seconds
             StartCoroutine(ResetSpeedingWarningCooldown());
         }
 
-        // Check following distance 
-        Transform carInFront = null;
-        float closestDistance = Mathf.Infinity;
-
-        // Find all cars (excluding right cars)
+        // Find all cars driving on the left side of the road
         GameObject[] leftCars = GameObject.FindGameObjectsWithTag("LeftCar");
 
+        // Iterate over these cars to check if the player is following too close to the other cars
         foreach (GameObject carObject in leftCars) {
             Vector3 toCar = carObject.transform.position - transform.position;
             // Following too close
@@ -422,7 +449,7 @@ public class MoveCar : MonoBehaviour {
             }
         }
 
-        // Check if on right lane
+        // Check if the player is on the right lane
         NavMeshHit hitNavMesh;
         if (NavMesh.SamplePosition(transform.position, out hitNavMesh, 0.5f, 1 << 8) && canShowWrongSideWarning) {
             playerScore -= 10;
@@ -438,8 +465,9 @@ public class MoveCar : MonoBehaviour {
 
         // Check if stopped 
         if (CheckForJunctionUnderCar() && Vector3.Distance(transform.position, lastIntersectionWarning) > 50) {
-            // Big range since the detection can be poor 
-            if (Vector3.Distance(transform.position, lastStopped) > 20) {
+            // Check if the player stopped within 10 units of the junction
+            if (Vector3.Distance(transform.position, lastStopped) > 10) {
+                // Warn the player and decrease the player score by 5
                 playerScore -= 5;
                 warningText.text = "You must come to a complete stop to give way at junctions (Roundabouts and Intersections).";
                 warningPanel.SetActive(true);
@@ -449,11 +477,10 @@ public class MoveCar : MonoBehaviour {
             lastIntersectionWarning = transform.position;
         }
 
-        // Set score text
+        // Set score text with appropriate colouring
         string scoreColour = "green";
         if (playerScore < 50) {
             scoreColour = "red";
-            // Fail the player here
         } else if (playerScore < 70) {
             scoreColour = "orange";
         } else if (playerScore < 90) {
@@ -462,7 +489,7 @@ public class MoveCar : MonoBehaviour {
         scoreText.text = $"Score: <color={scoreColour}>" + playerScore + "</color>";
     }
 
-    // The alert can show again after a time (in seconds) has been exceeded
+    // The alerts can show again after a time (in seconds) has been exceeded
     private IEnumerator ResetSpeedingWarningCooldown() {
         yield return new WaitForSeconds(2f);
         canShowSpeedingWarning = true;

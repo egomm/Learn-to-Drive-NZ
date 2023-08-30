@@ -8,6 +8,7 @@ public class GameOverManager : MonoBehaviour {
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI timerText;
 
+    // Function for formatting time in seconds to minutes:seconds
     private string FormatTime(float time) {
         int minutes = Mathf.FloorToInt(time / 60);
         int seconds = Mathf.FloorToInt(time % 60);
@@ -17,7 +18,7 @@ public class GameOverManager : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-        // Score text 
+        // Score text (the colour of this text is based on the player score)
         string scoreColour = "green";
         if (MoveCar.playerScore < 50) {
             scoreColour = "red";
@@ -28,7 +29,7 @@ public class GameOverManager : MonoBehaviour {
         }
         scoreText.text = $"Score: <color={scoreColour}>" + MoveCar.playerScore + "</color>";
 
-        // Time text 
+        // Time text (the colour of this text is based on the elapsed time)
         string timeColour = "red";
         if (MoveCar.elapsedTime >= 120) {
             timeColour = "orange";
@@ -41,6 +42,7 @@ public class GameOverManager : MonoBehaviour {
     }
 
     public void MainMenu() {
+        // Load the scene of the main menu
         SceneManager.LoadScene("Main Menu");
     }
 }

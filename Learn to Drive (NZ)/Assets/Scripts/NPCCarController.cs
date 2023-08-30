@@ -16,7 +16,6 @@ public class NPCCarController : MonoBehaviour
     private List<GameObject> passedObjects = new List<GameObject>();
 
     private Vector3 lastPosition;
-    private float timeStuck = 0.0f;
     private bool restartedCar = false;
 
     private float safeFollowingDistance = 10f; 
@@ -25,16 +24,15 @@ public class NPCCarController : MonoBehaviour
 
     int attempts = 0;
 
+    // IEnumerator for delaying the start 
     IEnumerator ExecuteDelayedTask() {
-        // Wait for the specified delay
+        // Wait for 0.25s
         yield return new WaitForSeconds(0.25f);
 
-        // This code will execute after the delay
         // Find a point at the end of the NavMesh initially
         startPosition = RoadManager.navMeshStart;
         endPosition = RoadManager.navMeshEnd;
         if (endPosition != Vector3.zero) {
-            NavMeshHit hit;
             if (agent.isOnNavMesh) {
                 if (gameObject.tag == "LeftCar") {
                     agent.SetDestination(endPosition);
@@ -54,6 +52,7 @@ public class NPCCarController : MonoBehaviour
         }
     }
 
+    // IEnumerator for restarting the car after having stopped at a junction
     IEnumerator RestartCar() {
         // Wait for 0.5-2 seconds
         restartedCar = true;
@@ -65,6 +64,7 @@ public class NPCCarController : MonoBehaviour
 
     void Start() {
         agent = GetComponent<NavMeshAgent>();
+        // Mask the navmesh depending on the type of car (left lane car or right lane car)
         if (gameObject.tag == "LeftCar") {
             agent.areaMask = 1 << 3;
         } else if (gameObject.tag == "RightCar") {
@@ -74,6 +74,7 @@ public class NPCCarController : MonoBehaviour
     }
 
     void Update() {
+        // Check if the car has started and is driving
         if (started && !stopped) {
             // To reduce lag
             if (Time.frameCount % 10 == 0) {
@@ -107,18 +108,18 @@ public class NPCCarController : MonoBehaviour
                         Destroy(gameObject);
                     }
                 }
-                // Need to do this for the right car
+                
+                // If the car is a left lane car
                 if (gameObject.CompareTag("LeftCar")) {
                     var prevKey = Vector3.zero;
                     Transform objectBelow = DetectCurrentObjectUnderAgent();
                     foreach (var key in RoadManager.roadInformation.Keys) {
-                        // Need to detect BEFORE the car has even get there
+                        // Detect before the car is at the roundabout 
                         GameObject objectChecking = RoadManager.roadInformation[key].GameObject;
                         if (objectChecking.CompareTag("Junction")) {
                             if (prevKey != Vector3.zero) {
-            
                                 if (objectBelow != null) {
-                                    // Check if player is on road before intersection
+                                    // Check if player is on road a before a junction
                                     if (prevKey == objectBelow.position) {
                                         stopped = true;
                                         break;
@@ -126,15 +127,13 @@ public class NPCCarController : MonoBehaviour
                                 }
                             }
                         } else {
-                            // Check the penultimate 
-                            //Transform secondObjectBelow = DetectSecondCurrentObjectUnderAgent();
+                            // If the object that is being checked is not a junction, check the children
                             for (int i = 0; i < objectChecking.transform.childCount; i++) {
                                 Transform child = objectChecking.transform.GetChild(i);
-
                                 if (child.CompareTag("Junction")) {
                                     if (prevKey != Vector3.zero) {
                                         if (objectBelow != null) {
-                                            // Check if player is on a roundabout
+                                            // Check if player is on a road before a junction
                                             if (objectBelow.position == prevKey) {
                                                 stopped = true;
                                                 break;
@@ -147,29 +146,30 @@ public class NPCCarController : MonoBehaviour
                                 break;
                             }
                         }
+                        // Set the previous key to the current key for managing if the previous road was a junction
                         prevKey = key;
                     }
-                } else if (gameObject.CompareTag("RightCar")) {
+                } else if (gameObject.CompareTag("RightCar")) { // If the car is a right lane car
                     Transform objectBelow = DetectCurrentObjectUnderAgent();
                     bool nextJunction = false;
                     foreach (var key in RoadManager.roadInformation.Keys) {
-                        // Need to detect BEFORE the car has even get there
+                        // Detect before the car is at the roundabout 
                         GameObject objectChecking = RoadManager.roadInformation[key].GameObject;
                         if (nextJunction) {
                             nextJunction = false;
                             if (objectBelow != null) {
-                                // Check if player is on road before intersection
+                                // Check if player is on a road before a junction
                                 if (key == objectBelow.position) {
                                     stopped = true;
                                     break;
                                 }
                             }
                         }
+                        // Check if the next road is a junction
                         if (objectChecking.CompareTag("Junction")) {
                             nextJunction = true;
                         } else {
-                            // Check the penultimate 
-                            //Transform secondObjectBelow = DetectSecondCurrentObjectUnderAgent();
+                            // Check the children of the parent object
                             for (int i = 0; i < objectChecking.transform.childCount; i++) {
                                 Transform child = objectChecking.transform.GetChild(i);
                                 if (child.CompareTag("Junction")) {
@@ -184,12 +184,15 @@ public class NPCCarController : MonoBehaviour
                 }
             }
         } else if (stopped) {
+            // If the player has been stopped at a roundabout, check the object below 
+            // If the object below is not a junction, continue driving forward, else stop momentarily
             Transform objectBelow = DetectCurrentObjectUnderAgent();
             Transform secondObjectBelow = DetectSecondCurrentObjectUnderAgent();
             startPosition = RoadManager.navMeshStart; 
             endPosition = RoadManager.navMeshEnd;
             if (objectBelow && secondObjectBelow && !restartedCar) {
                 if (objectBelow.CompareTag("Junction") || secondObjectBelow.CompareTag("Junction")) {
+                    // Stop the car for 0.5 to 2 seconds
                     agent.speed = 0;
                     StartCoroutine(RestartCar());
                 } else {
@@ -198,11 +201,13 @@ public class NPCCarController : MonoBehaviour
                     } else if (gameObject.CompareTag("RightCar")) {
                         agent.SetDestination(startPosition);
                     }
+                    // Manage the speed of the NPC car depending on the speed of the car in front
                     Transform carInFront = FindCarInFront(gameObject.tag);
                     if (carInFront) {
                         float desiredSpeed = CalculateDesiredSpeed(carInFront);
                         agent.speed = desiredSpeed;
                     } else {
+                        // No car in front, the NPC car can go at maximum speed
                         agent.speed = maxSpeed;
                     }
                 }
@@ -217,6 +222,7 @@ public class NPCCarController : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, Mathf.Infinity)) {
             GameObject hitObject = hit.collider.gameObject;
+            // Return the ultimate parent of the object below the player
             return GetUltimateParentOf(hitObject.transform);
         } else {
             return null;
@@ -230,27 +236,32 @@ public class NPCCarController : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, Mathf.Infinity)) {
             GameObject hitObject = hit.collider.gameObject;
+            // Return the penultimate parent of the object below the player
             return GetPenultimateParentOf(hitObject.transform);
         } else {
             return null;
         }
     }
 
+    // Function for getting the ultimate parent of an object
     Transform GetUltimateParentOf(Transform child) {
         Transform parent = child.parent;
-        while (parent != null)
-        {
+
+        // Continue iterating until the object has no parent
+        while (parent != null) {
             child = parent;
             parent = parent.parent;
         }
         return child;
     }
 
+    // Function for getting the penultimate (second) parent of an object 
     Transform GetPenultimateParentOf(Transform child) {
         Transform parent = child.parent;
         Transform penultimateParent = null;
         Transform ultimateParent = child;
 
+        // Continue iterating until the object has no parent
         while (parent != null) {
             penultimateParent = ultimateParent;
             ultimateParent = parent;
@@ -290,7 +301,8 @@ public class NPCCarController : MonoBehaviour
         return carInFront;
     }
 
-
+    // Function for calculating the desired speed of the NPC car 
+    // This depends on the speed of the car in front and the distance between the cars
     private float CalculateDesiredSpeed(Transform carInFront) {
         // Randomise following distance
         safeFollowingDistance = UnityEngine.Random.Range(7.5f, 10f);
@@ -309,10 +321,11 @@ public class NPCCarController : MonoBehaviour
         // Calculate the desired speed based on safe following distance
         float desiredSpeed = Mathf.Lerp(0f, maxSpeed, distanceFactor);
 
-        // Ensure that the calculated desired speed is not greater than the speed of the car in front
+        // The car will have a NavMeshAgent or Rigidbody depending on if it is an NPC car or a normal car
         NavMeshAgent carInFrontAgent = carInFront.GetComponent<NavMeshAgent>();
         Rigidbody carInFrontRigidbody = carInFront.GetComponent<Rigidbody>();
 
+        // Ensure that the calculated desired speed is not greater than the speed of the car in front
         if (carInFrontAgent) {
             float speedOfCarInFront = carInFrontAgent.velocity.magnitude;
             desiredSpeed = Mathf.Min(desiredSpeed, speedOfCarInFront);

@@ -16,16 +16,18 @@ public class GrassManager : MonoBehaviour {
         UpdateGrassPlanes();
     }
 
-    private void Update() {
+    void Update() {
         Vector3 playerMovement = player.position - lastPlayerPosition;
 
+        // Update the grass planes as the player moves
         if (playerMovement.magnitude >= interval) {
             UpdateGrassPlanes();
             lastPlayerPosition = player.position;
         }
     }
 
-    void AddGrassPlane(int x, int z, GameObject grassPlane) {
+    // Function for adding a grass plane given a coordinate and a plane
+    private void AddGrassPlane(int x, int z, GameObject grassPlane) {
         if (!grassPlanesDict.ContainsKey(x)) {
             grassPlanesDict[x] = new Dictionary<int, GameObject>();
         }
@@ -36,18 +38,7 @@ public class GrassManager : MonoBehaviour {
         }
     }
 
-    private void SpawnGrassPlaneGrid() {
-        int halfPlaneCount = Mathf.FloorToInt(planeCount / 2);
-
-        for (int x = -halfPlaneCount; x <= halfPlaneCount; x++) {
-            for (int z = -halfPlaneCount; z <= halfPlaneCount; z++) {
-                Vector3 spawnPosition = new Vector3(x * interval, yOffset, z * interval);
-                GameObject spawnedGrass = Instantiate(grassPrefab, spawnPosition, Quaternion.identity);
-                AddGrassPlane(x, z, spawnedGrass);
-            }
-        }
-    }
-
+    // Function for updating the grass planes based on the player position
     private void UpdateGrassPlanes() {
         int playerXIndex = Mathf.FloorToInt(player.position.x / interval);
         int playerZIndex = Mathf.FloorToInt(player.position.z / interval);

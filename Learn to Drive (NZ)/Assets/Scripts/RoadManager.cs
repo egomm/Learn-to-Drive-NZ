@@ -5,11 +5,12 @@ using UnityEngine.AI;
 using Unity.AI.Navigation;
 
 public class RoadManager : MonoBehaviour {
-    // Class for the road information
+    // Class for managing the road information
     public class RoadInformation {
         public GameObject GameObject;
         public Quaternion Quaternion;
 
+        // Manage the position and the rotation 
         public RoadInformation(GameObject gameObject, Quaternion quaternion) {
             GameObject = gameObject;
             Quaternion = quaternion;
@@ -66,15 +67,14 @@ public class RoadManager : MonoBehaviour {
     // Active road prefabs 
     public static Dictionary<Vector3, GameObject> activeRoadPrefabs = new Dictionary<Vector3, GameObject>();
 
-    // Roundabout frequency
+    // Road frequency
     private float roundaboutFrequency = 0.1f;
     private float curveFrequency = 0.05f;
     private float intersectionFrequency = 0.15f;
-    private float straightFrequency = 0.7f;
 
     // Start is called before the first frame update
     void Start() {
-        // Clear all statics
+        // Clear all static variables
         roadInformation.Clear();
         activeRoadPrefabs.Clear();
         navMeshStart = Vector3.zero;
@@ -82,8 +82,8 @@ public class RoadManager : MonoBehaviour {
         lastInstantiated = new Vector3(0, 0, 0);
         lastInstantiatedRoad = null;
 
-        // Generate between 600 and 800 roads
-        int roundCount = Random.Range(600, 800);
+        // Generate 2500 roads (this is around 50km worth and should last the player for at least an hour if they somehow manage to last)
+        int roundCount = 500;
         // Measure the current angle in degrees
         bool changedAngle = false;
         int currentAngle = 0;
@@ -101,7 +101,6 @@ public class RoadManager : MonoBehaviour {
             UpdateNearbyRoadCoordinates();
         }
         for (int i = 0; i < roundCount; i++) {
-            // Make sure there can only be a roundabout every 5 roads
             float randomRoadGeneration = Random.Range(0f, 1f);
             GameObject roadType;
             int alternativeAngle = -1;
@@ -111,12 +110,12 @@ public class RoadManager : MonoBehaviour {
              * current angle by 90 or 180 degrees dependent on the situation.
             */
             if (i > 0) {
+                // There can only be a a junction every 4 roads 
                 if (randomRoadGeneration < roundaboutFrequency && (i - previousRoundabout) > 3 && (i - previousIntersection) > 3 && (i - previousCurve) > 1) {
                     // Roundabout
                     previousRoundabout = i;
                     float twoRoundaboutFrequency = 0.15f;
                     float threeRoundaboutFrequency = 0.40f;
-                    float fourRoundaboutFrequency = 0.45f;
                     float randomRoundaboutGeneration = Random.Range(0f, 1f);
                     if (randomRoundaboutGeneration < twoRoundaboutFrequency) {
                         roadType = twoRoundabout;
@@ -282,6 +281,7 @@ public class RoadManager : MonoBehaviour {
                 }
             }
             if (!roadInformation.ContainsKey(roadCoordinates)) {
+                // Add the road into the list of road information
                 roadInformation.Add(roadCoordinates, new RoadInformation(roadType, Quaternion.Euler(new Vector3(0, angle, 0))));
                 previousRoadCoordinates = roadCoordinates;
             } else {
@@ -292,6 +292,7 @@ public class RoadManager : MonoBehaviour {
         UpdateNearbyRoadCoordinates();
     }
 
+    // Recursive function for finding a child of a parent with a given tag
     Transform FindChildWithTagRecursively(Transform parent, string tag) {
         if (parent.CompareTag(tag)) {
             return parent;
@@ -308,22 +309,8 @@ public class RoadManager : MonoBehaviour {
         return null;
     }
 
-    List<Transform> FindAllBarriersRecursively(Transform parent) {
-        List<Transform> barrierList = new List<Transform>();
-
-        foreach (Transform child in parent) {
-            if (child.gameObject.layer == 9) {
-                barrierList.Add(child);
-            }
-
-            List<Transform> childBarriers = FindAllBarriersRecursively(child);
-            barrierList.AddRange(childBarriers);
-        }
-
-        return barrierList;
-    }
-
-    Vector3 getAddon(float angle) {
+    // Function for getting addon coordinates for a road to ensure that cars are spawned on the correct part of the road
+    Vector3 GetAddon(float angle) {
         if (angle == 270) {
             return new Vector3(0, 0, -1.95f);
         } else if (angle == 0) {
@@ -361,7 +348,7 @@ public class RoadManager : MonoBehaviour {
                 }
             }
             if (addedNewRoad) {
-                // Remove existing NavMeshSurface components
+                // Remove existing NavMeshSurface components to avoid baking the same navmesh multiple times
                 NavMeshSurface[] existingNavMeshSurfaces = gameObject.GetComponents<NavMeshSurface>();
                 foreach (NavMeshSurface existingSurface in existingNavMeshSurfaces) {
                     Destroy(existingSurface);
@@ -419,7 +406,6 @@ public class RoadManager : MonoBehaviour {
 
                 // Spawn cars on the spawn left tag
                 Transform leftChildWithTargetTag = FindChildWithTagRecursively(roadInstance.transform, "SpawnLeft");
-                Transform closestBarrier = null;
                 if (leftChildWithTargetTag != null) {
                     // Spawn car here
                     int angle = (int) leftChildWithTargetTag.eulerAngles.y;
@@ -427,9 +413,9 @@ public class RoadManager : MonoBehaviour {
                     float carTypeRandom = Random.Range(0f, 1f);
                     GameObject leftCarPrefab;
                     if (carTypeRandom <= 0.5f) {
-                        leftCarPrefab = Instantiate(blueCarNPC, leftChildWithTargetTag.position + getAddon(angle), leftChildWithTargetTag.rotation);
+                        leftCarPrefab = Instantiate(blueCarNPC, leftChildWithTargetTag.position + GetAddon(angle), leftChildWithTargetTag.rotation);
                     } else {
-                        leftCarPrefab = Instantiate(blackCarNPC, leftChildWithTargetTag.position + getAddon(angle), leftChildWithTargetTag.rotation);
+                        leftCarPrefab = Instantiate(blackCarNPC, leftChildWithTargetTag.position + GetAddon(angle), leftChildWithTargetTag.rotation);
                     }
                     leftCarPrefab.tag = "LeftCar";
                 }
@@ -439,12 +425,13 @@ public class RoadManager : MonoBehaviour {
                 if (rightChildWithTargetTag != null) {
                     // Spawn car here
                     int angle = (int) rightChildWithTargetTag.eulerAngles.y;
+                    // Determine what colour of cat to spawn
                     float carTypeRandom = Random.Range(0f, 1f);
                     GameObject rightCarPrefab;
                     if (carTypeRandom <= 0.5f) {
-                        rightCarPrefab = Instantiate(blueCarNPC, rightChildWithTargetTag.position + getAddon(angle), rightChildWithTargetTag.rotation);
+                        rightCarPrefab = Instantiate(blueCarNPC, rightChildWithTargetTag.position + GetAddon(angle), rightChildWithTargetTag.rotation);
                     } else {
-                        rightCarPrefab = Instantiate(blackCarNPC, rightChildWithTargetTag.position + getAddon(angle), rightChildWithTargetTag.rotation);
+                        rightCarPrefab = Instantiate(blackCarNPC, rightChildWithTargetTag.position + GetAddon(angle), rightChildWithTargetTag.rotation);
                     }
                     rightCarPrefab.tag = "RightCar";
                 }
@@ -454,6 +441,7 @@ public class RoadManager : MonoBehaviour {
                 Transform rightSpawnTransform = null;
                 foreach (Transform child in roadInstance.transform) {
                     int childLayer = child.gameObject.layer;
+                    // Check if this child is a left lane or a right lane
                     if (childLayer == 6) {
                          leftSpawnTransform = child; 
                     } else if (childLayer == 7) {
@@ -462,15 +450,15 @@ public class RoadManager : MonoBehaviour {
                 }
 
                 float spawnCarRandom = Random.Range(0f, 1f);
-                if (spawnCarRandom < 0.5f) {
+                if (spawnCarRandom <= 0.5f) {
                     if (leftSpawnTransform != null) {
                         Quaternion carRotation = Quaternion.Euler(0, leftSpawnTransform.rotation.y, 0);
                         float carTypeRandom = Random.Range(0f, 1f);
                         GameObject leftCarPrefab;
                         if (carTypeRandom <= 0.5f) {
-                            leftCarPrefab = Instantiate(blueCarNPC, leftSpawnTransform.position + getAddon(carRotation.eulerAngles.y), carRotation);
+                            leftCarPrefab = Instantiate(blueCarNPC, leftSpawnTransform.position + GetAddon(carRotation.eulerAngles.y), carRotation);
                         } else {
-                            leftCarPrefab = Instantiate(blackCarNPC, leftSpawnTransform.position + getAddon(carRotation.eulerAngles.y), carRotation);
+                            leftCarPrefab = Instantiate(blackCarNPC, leftSpawnTransform.position + GetAddon(carRotation.eulerAngles.y), carRotation);
                         }
                         leftCarPrefab.tag = "LeftCar";
                     }
@@ -480,9 +468,9 @@ public class RoadManager : MonoBehaviour {
                         float carTypeRandom = Random.Range(0f, 1f);
                         GameObject rightCarPrefab;
                         if (carTypeRandom <= 0.5f) {
-                            rightCarPrefab = Instantiate(blueCarNPC, rightSpawnTransform.position + getAddon(carRotation.eulerAngles.y), carRotation);
+                            rightCarPrefab = Instantiate(blueCarNPC, rightSpawnTransform.position + GetAddon(carRotation.eulerAngles.y), carRotation);
                         } else {
-                            rightCarPrefab = Instantiate(blackCarNPC, rightSpawnTransform.position + getAddon(carRotation.eulerAngles.y), carRotation);
+                            rightCarPrefab = Instantiate(blackCarNPC, rightSpawnTransform.position + GetAddon(carRotation.eulerAngles.y), carRotation);
                         }
                         rightCarPrefab.tag = "RightCar";
                     }
@@ -493,13 +481,15 @@ public class RoadManager : MonoBehaviour {
             Vector3 playerPosition = player.transform.position;
             List<Vector3> coordinatesToRemove = new List<Vector3>();
             foreach (var roadCoordinate in activeRoadCoordinates) {
+                // Check if this road is within range
                 if (Vector3.SqrMagnitude(roadCoordinate - playerPosition) > squaredDistanceThreshold) {
-                    // Remove the road coordinate and destroy it 
+                    // Remove the road coordinate and destroy the prefab  
                     coordinatesToRemove.Add(roadCoordinate);
                     Destroy(activeRoadPrefabs[roadCoordinate]);
                 }
             }
-            foreach(var coordinate in coordinatesToRemove) {
+            // Remove each coordinate now (cannot remove an item from a dictionary while iterating over it)
+            foreach (var coordinate in coordinatesToRemove) {
                 activeRoadCoordinates.Remove(coordinate);
                 activeRoadPrefabs.Remove(coordinate);
             }
@@ -528,14 +518,16 @@ public class RoadManager : MonoBehaviour {
         }
     }
 
+    // Function for finding the start of navmesh based on the active roads
     Vector3 FindStartOfNavMesh() {
-        var keys = activeRoadPrefabs.Keys;
         float closestDistance = float.MaxValue;
         Vector3 closestPoint = Vector3.zero;
 
-        foreach (var key in keys) {
+        // Iterate over each of the active roads
+        foreach (var key in activeRoadPrefabs.Keys) {
             Vector3 startOfRoad = FindStartOfNavMeshOfRoad(activeRoadPrefabs[key]);
             float distance = Vector3.Distance(Vector3.zero, startOfRoad);
+            // Find the closest road to the origin with navmesh
             if (distance < closestDistance) {
                 closestDistance = distance;
                 closestPoint = startOfRoad;
@@ -544,27 +536,32 @@ public class RoadManager : MonoBehaviour {
         return closestPoint;
     }
 
+    // Function for finding the start of navmesh of a road
     Vector3 FindStartOfNavMeshOfRoad(GameObject roadObject) {
         NavMeshHit hit;
         Vector3 closestPoint = Vector3.zero;
         float closestDistance = float.MaxValue;
 
+        // Ensure the provided road object is not null
         if (roadObject != null) {
+            // Iterate over the children in the object to find the closest point to the origin
             foreach (Transform child in roadObject.transform) {
                 Vector3 childPosition = child.position;
+                // Bitwise shift left operator used to make sure the navmesh layer matches correctly (id: 8)
                 if (NavMesh.SamplePosition(childPosition, out hit, float.MaxValue, 1 << 8)) {
                     float distance = Vector3.Distance(Vector3.zero, hit.position);
+                    // Find the closest point to the origin
                     if (distance < closestDistance) {
                         closestDistance = distance;
                         closestPoint = hit.position;
                     }
                 }
 
-                // Recurse into children
+                // Recurse into the children's children
                 if (child.childCount > 0) {
                     Vector3 grandchildClosestPoint = FindStartOfNavMeshOfRoad(child.gameObject);
                     float grandchildDistance = Vector3.Distance(Vector3.zero, grandchildClosestPoint);
-
+                    // Find the closest point to the origin
                     if (grandchildDistance < closestDistance) {
                         closestDistance = grandchildDistance;
                         closestPoint = grandchildClosestPoint;
@@ -600,13 +597,14 @@ public class RoadManager : MonoBehaviour {
         Vector3 origin = Vector3.zero;
         float furthestDistance = 0f;
 
+        // Ensure the provided road object isn't null
         if (roadObject != null) {
             foreach (Transform child in roadObject.transform) {
                 Vector3 childPosition = child.position;
-                // Use a bitwise operation to match this with all of the left roads (id: 9)
+                // Bitwise shift left operator used to make sure the navmesh layer matches correctly (id: 9)
                 if (NavMesh.SamplePosition(childPosition, out hit, float.MaxValue, 1 << 9)) {
                     float distance = Vector3.Distance(origin, hit.position);
-                    // Check if this is further than the current furthest
+                    // Check if this point is further than the current furthest point
                     if (distance > furthestDistance) {
                         furthestDistance = distance;
                         furthestPoint = hit.position;
@@ -617,6 +615,7 @@ public class RoadManager : MonoBehaviour {
                 if (child.childCount > 0) {
                     Vector3 grandchildFurthestPoint = FindEndOfNavMeshOfRoad(child.gameObject);
                     float grandchildDistance = Vector3.Distance(origin, grandchildFurthestPoint);
+                    // Check if this point is further than the current furthest point
                     if (grandchildDistance > furthestDistance) {
                         furthestDistance = grandchildDistance;
                         furthestPoint = grandchildFurthestPoint;
@@ -628,7 +627,9 @@ public class RoadManager : MonoBehaviour {
         return furthestPoint;
     }
 
+    // Function for updating the road coordinates
     private void UpdateNearbyRoadCoordinates() {
+        // Clear the nearby road coordinates, then update them
         nearbyRoadCoordinates.Clear();
 
         // Calculate the squared distance 
