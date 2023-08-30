@@ -31,12 +31,12 @@ public class GameOverManager : MonoBehaviour {
 
         // Time text (the colour of this text is based on the elapsed time)
         string timeColour = "red";
-        if (MoveCar.elapsedTime >= 120) {
-            timeColour = "orange";
+        if (MoveCar.elapsedTime >= 360) {
+            timeColour = "green";
         } else if (MoveCar.elapsedTime >= 240) {
             timeColour = "yellow";
-        } else if (MoveCar.elapsedTime >= 360) {
-            timeColour = "green";
+        } else if (MoveCar.elapsedTime >= 120) {
+            timeColour = "orange";
         }
         timerText.text = $"Time: <color={timeColour}>" + FormatTime(MoveCar.elapsedTime) + "</color>";
     }

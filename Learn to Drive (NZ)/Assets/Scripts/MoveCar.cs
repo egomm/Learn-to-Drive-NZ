@@ -409,12 +409,12 @@ public class MoveCar : MonoBehaviour {
         elapsedTime += Time.deltaTime;
         // Set the timer text with coloured text depending on the elapsed time
         string timeColour = "red";
-        if (elapsedTime >= 120) {
-            timeColour = "orange";
+        if (elapsedTime >= 360) {
+            timeColour = "green";
         } else if (elapsedTime >= 240) {
             timeColour = "yellow";
-        } else if (elapsedTime >= 360) {
-            timeColour = "green";
+        } else if (elapsedTime >= 120) {
+            timeColour = "orange";
         }
         timerText.text = $"Time: <color={timeColour}>" + FormatTime(elapsedTime) + "</color>";
         // Check speed
@@ -465,8 +465,8 @@ public class MoveCar : MonoBehaviour {
 
         // Check if stopped 
         if (CheckForJunctionUnderCar() && Vector3.Distance(transform.position, lastIntersectionWarning) > 50) {
-            // Check if the player stopped within 10 units of the junction
-            if (Vector3.Distance(transform.position, lastStopped) > 10) {
+            // Check if the player stopped within 12.5 units of the junction
+            if (Vector3.Distance(transform.position, lastStopped) > 12.5f) {
                 // Warn the player and decrease the player score by 5
                 playerScore -= 5;
                 warningText.text = "You must come to a complete stop to give way at junctions (Roundabouts and Intersections).";

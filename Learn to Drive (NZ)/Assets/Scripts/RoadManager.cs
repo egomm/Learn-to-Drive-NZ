@@ -83,7 +83,7 @@ public class RoadManager : MonoBehaviour {
         lastInstantiatedRoad = null;
 
         // Generate 2500 roads (this is around 50km worth and should last the player for at least an hour if they somehow manage to last)
-        int roundCount = 500;
+        int roundCount = 2500;
         // Measure the current angle in degrees
         bool changedAngle = false;
         int currentAngle = 0;
